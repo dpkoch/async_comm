@@ -10,6 +10,7 @@ include_directories(include)
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME}
+  src/comm.cpp
   src/udp.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
