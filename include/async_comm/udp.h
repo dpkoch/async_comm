@@ -1,3 +1,8 @@
+/**
+ * @file udp.h
+ * @author Daniel Koch <danielpkoch@gmail.com>
+ */
+
 #ifndef ASYNC_COMM_UDP_H
 #define ASYNC_COMM_UDP_H
 
@@ -11,9 +16,20 @@
 namespace async_comm
 {
 
+/**
+ * @class UDP
+ * @brief Asynchronous communication class for a UDP socket
+ */
 class UDP : public Comm
 {
 public:
+  /**
+   * @brief Bind a UPD socket
+   * @param bind_host The bind host where this application is listening (usually "localhost")
+   * @param bind_port The bind port where this application is listening
+   * @param remote_host The remote host to communicate with
+   * @param remote_port The port on the remote host
+   */
   UDP(std::string bind_host = DEFAULT_BIND_HOST, uint16_t bind_port = DEFAULT_BIND_PORT,
       std::string remote_host = DEFAULT_REMOTE_HOST, uint16_t remote_port = DEFAULT_REMOTE_PORT);
   ~UDP();

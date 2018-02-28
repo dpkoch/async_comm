@@ -1,3 +1,8 @@
+/**
+ * @file comm.cpp
+ * @author Daniel Koch <danielpkoch@gmail.com>
+ */
+
 #include <async_comm/comm.h>
 
 #include <iostream>

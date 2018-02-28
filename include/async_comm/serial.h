@@ -1,3 +1,8 @@
+/**
+ * @file serial.h
+ * @author Daniel Koch <danielpkoch@gmail.com>
+ */
+
 #ifndef ASYNC_COMM_SERIAL_H
 #define ASYNC_COMM_SERIAL_H
 
@@ -11,9 +16,18 @@
 namespace async_comm
 {
 
+/**
+ * @class Serial
+ * @brief Asynchronous communication class for a serial port
+ */
 class Serial : public Comm
 {
 public:
+  /**
+   * @brief Open a serial port
+   * @param port The port to open (e.g. "/dev/ttyUSB0")
+   * @param baud_rate The baud rate for the serial port (e.g. 115200)
+   */
   Serial(std::string port, unsigned int baud_rate);
   ~Serial();
 

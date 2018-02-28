@@ -1,3 +1,8 @@
+/**
+ * @file serial.cpp
+ * @author Daniel Koch <danielpkoch@gmail.com>
+ */
+
 #include <async_comm/serial.h>
 
 #include<iostream>

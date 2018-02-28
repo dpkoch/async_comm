@@ -1,3 +1,8 @@
+/**
+ * @file comm.h
+ * @author Daniel Koch <danielpkoch@gmail.com>
+ */
+
 #ifndef ASYNC_COMM_COMM_H
 #define ASYNC_COMM_COMM_H
 
@@ -12,15 +17,38 @@
 namespace async_comm
 {
 
+/**
+ * @class Comm
+ * @brief Abstract base class for an asynchronous communication port
+ */
 class Comm
 {
 public:
   Comm();
   virtual ~Comm();
+
+  /**
+   * @brief Initializes and opens the port
+   * @return True if the port was succesfully initialized
+   */
   bool init();
+
+  /**
+   * @brief Closes the port
+   */
   void close();
 
+  /**
+   * @brief Send bytes from a buffer over the port
+   * @param src Address of the buffer
+   * @param len Number of bytes to send
+   */
   void send_bytes(const uint8_t * src, size_t len);
+
+  /**
+   * @brief Register a callback function for when bytes are received on the port
+   * @param fun Function to call when bytes are received
+   */
   void register_receive_callback(std::function<void(uint8_t)> fun);
 
 protected:
