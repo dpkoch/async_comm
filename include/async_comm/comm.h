@@ -30,8 +30,10 @@ protected:
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;
   virtual void do_close() = 0;
-  virtual void do_async_read(const boost::asio::mutable_buffers_1 &buffer, boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
-  virtual void do_async_write(const boost::asio::const_buffers_1 &buffer, boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
+  virtual void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
+                             boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
+  virtual void do_async_write(const boost::asio::const_buffers_1 &buffer,
+                              boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
 
   boost::asio::io_service io_service_;
 
