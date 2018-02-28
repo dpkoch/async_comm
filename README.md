@@ -1,5 +1,7 @@
 # Async Comm Library
 
+[![Documentation Status](https://codedocs.xyz/dpkoch/async_comm.svg)](https://codedocs.xyz/dpkoch/async_comm/)
+
 This project provides a C++ library that gives a simple interface for asynchronous serial communications over a serial port or UDP.
 It uses the [Boost.Asio](http://www.boost.org/doc/libs/master/doc/html/boost_asio.html) library under the hood, but hides from the user the details of interfacing with the ports or sockets and managing send/receive buffers.
 
