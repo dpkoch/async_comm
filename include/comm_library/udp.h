@@ -1,11 +1,7 @@
 #ifndef COMM_LIBRARY_UDP_H
 #define COMM_LIBRARY_UDP_H
 
-#include <functional>
-#include <list>
-#include <mutex>
 #include <string>
-#include <thread>
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
@@ -31,8 +27,10 @@ private:
   bool is_open() override;
   bool do_init() override;
   void do_close() override;
-  void do_async_read(const boost::asio::mutable_buffers_1 &buffer, boost::function<void(const boost::system::error_code&, size_t)> handler) override;
-  void do_async_write(const boost::asio::const_buffers_1 &buffer, boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+  void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
+                     boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+  void do_async_write(const boost::asio::const_buffers_1 &buffer,
+                      boost::function<void(const boost::system::error_code&, size_t)> handler) override;
 
   std::string bind_host_;
   uint16_t bind_port_;

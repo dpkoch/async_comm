@@ -1,6 +1,5 @@
 #include <comm_library/udp.h>
 
-#include <cstdio>
 #include <iostream>
 
 using boost::asio::ip::udp;
@@ -62,12 +61,14 @@ void UDP::do_close()
   socket_.close();
 }
 
-void UDP::do_async_read(const boost::asio::mutable_buffers_1 &buffer, boost::function<void(const boost::system::error_code&, size_t)> handler)
+void UDP::do_async_read(const boost::asio::mutable_buffers_1 &buffer,
+                        boost::function<void(const boost::system::error_code&, size_t)> handler)
 {
   socket_.async_receive_from(buffer, remote_endpoint_, handler);
 }
 
-void UDP::do_async_write(const boost::asio::const_buffers_1 &buffer, boost::function<void(const boost::system::error_code&, size_t)> handler)
+void UDP::do_async_write(const boost::asio::const_buffers_1 &buffer,
+                         boost::function<void(const boost::system::error_code&, size_t)> handler)
 {
   socket_.async_send_to(buffer, remote_endpoint_, handler);
 }
