@@ -1,14 +1,14 @@
-#ifndef COMM_LIBRARY_SERIAL_H
-#define COMM_LIBRARY_SERIAL_H
+#ifndef ASYNC_COMM_SERIAL_H
+#define ASYNC_COMM_SERIAL_H
 
 #include <string>
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-#include <comm_library/comm.h>
+#include <async_comm/comm.h>
 
-namespace comm_library
+namespace async_comm
 {
 
 class Serial : public Comm
@@ -32,6 +32,6 @@ private:
   boost::asio::serial_port serial_port_;
 };
 
-} // namespace comm_library
+} // namespace async_comm
 
-#endif // COMM_LIBRARY_SERIAL_H
+#endif // ASYNC_COMM_SERIAL_H

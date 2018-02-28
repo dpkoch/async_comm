@@ -1,4 +1,4 @@
-#include <comm_library/udp.h>
+#include <async_comm/udp.h>
 
 #include <cstdint>
 #include <cstring>
@@ -15,10 +15,10 @@ void echo(uint8_t byte)
 int main()
 {
   // open UDP ports
-  comm_library::UDP udp1("localhost", 14620, "localhost", 14625);
+  async_comm::UDP udp1("localhost", 14620, "localhost", 14625);
   udp1.register_receive_callback(&echo);
 
-  comm_library::UDP udp2("localhost", 14625, "localhost", 14620);
+  async_comm::UDP udp2("localhost", 14625, "localhost", 14620);
   udp2.register_receive_callback(&echo);
 
   if (!udp1.init() || !udp2.init())

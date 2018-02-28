@@ -1,14 +1,14 @@
-#ifndef COMM_LIBRARY_UDP_H
-#define COMM_LIBRARY_UDP_H
+#ifndef ASYNC_COMM_UDP_H
+#define ASYNC_COMM_UDP_H
 
 #include <string>
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-#include <comm_library/comm.h>
+#include <async_comm/comm.h>
 
-namespace comm_library
+namespace async_comm
 {
 
 class UDP : public Comm
@@ -43,6 +43,6 @@ private:
   boost::asio::ip::udp::endpoint remote_endpoint_;
 };
 
-} // namespace comm_library
+} // namespace async_comm
 
-#endif // COMM_LIBRARY_UDP_H
+#endif // ASYNC_COMM_UDP_H

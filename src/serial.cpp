@@ -1,10 +1,10 @@
-#include <comm_library/serial.h>
+#include <async_comm/serial.h>
 
 #include<iostream>
 
 using boost::asio::serial_port_base;
 
-namespace comm_library
+namespace async_comm
 {
 
 Serial::Serial(std::string port, unsigned int baud_rate) :
@@ -62,4 +62,4 @@ void Serial::do_async_write(const boost::asio::const_buffers_1 &buffer,
   serial_port_.async_write_some(buffer, handler);
 }
 
-} // namespace comm_library
+} // namespace async_comm

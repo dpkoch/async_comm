@@ -1,9 +1,9 @@
-#include <comm_library/comm.h>
+#include <async_comm/comm.h>
 
 #include <iostream>
 #include <boost/bind.hpp>
 
-namespace comm_library
+namespace async_comm
 {
 
 Comm::Comm() :
@@ -137,4 +137,4 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
     async_write(false);
 }
 
-} // namespace comm_library
+} // namespace async_comm

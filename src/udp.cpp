@@ -1,10 +1,10 @@
-#include <comm_library/udp.h>
+#include <async_comm/udp.h>
 
 #include <iostream>
 
 using boost::asio::ip::udp;
 
-namespace comm_library
+namespace async_comm
 {
 
 
@@ -73,4 +73,4 @@ void UDP::do_async_write(const boost::asio::const_buffers_1 &buffer,
   socket_.async_send_to(buffer, remote_endpoint_, handler);
 }
 
-} // namespace comm_library
+} // namespace async_comm

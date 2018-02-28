@@ -1,5 +1,5 @@
-#ifndef COMM_LIBRARY_COMM_H
-#define COMM_LIBRARY_COMM_H
+#ifndef ASYNC_COMM_COMM_H
+#define ASYNC_COMM_COMM_H
 
 #include <functional>
 #include <list>
@@ -9,7 +9,7 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-namespace comm_library
+namespace async_comm
 {
 
 class Comm
@@ -73,6 +73,6 @@ private:
   std::function<void(uint8_t)> receive_callback_;
 };
 
-} // namespace comm_library
+} // namespace async_comm
 
-#endif // COMM_LIBRARY_COMM_H
+#endif // ASYNC_COMM_COMM_H

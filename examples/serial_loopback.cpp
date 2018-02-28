@@ -1,4 +1,4 @@
-#include <comm_library/serial.h>
+#include <async_comm/serial.h>
 
 #include <cstdint>
 #include <cstdio>
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
   }
 
   // open serial port
-  comm_library::Serial serial(port, 115200);
+  async_comm::Serial serial(port, 115200);
   serial.register_receive_callback(&echo);
 
   if (!serial.init())
