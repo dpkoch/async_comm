@@ -60,7 +60,7 @@ where `serial_` is an instance of `async_comm::Serial`.
 
 ## Examples
 
-There are two simple examples provided in the repository:
+There are two simple examples provided in the repository. To build the examples, run CMake with the `-DBUILD_EXAMPLES=ON` flag.
 
   - `examples/serial_loopback.cpp`: Designed for use with a USB-to-UART adapter with the RX and TX pins connected together (loopback). Sends a series of bytes out and prints them to the console as they are received back.
   - `examples/udp_hello_world.cpp`: Opens two UDP objects listening on different ports on the local host, and then uses each to send a simple "hello world" message to the other.

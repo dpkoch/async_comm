@@ -20,8 +20,13 @@ add_library(${PROJECT_NAME}
 )
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(udp_hello_world examples/udp_hello_world.cpp)
-target_link_libraries(udp_hello_world ${PROJECT_NAME})
+# examples
+option(BUILD_EXAMPLES "Build examples" OFF)
 
-add_executable(serial_loopback examples/serial_loopback.cpp)
-target_link_libraries(serial_loopback ${PROJECT_NAME})
+if(BUILD_EXAMPLES)
+  add_executable(udp_hello_world examples/udp_hello_world.cpp)
+  target_link_libraries(udp_hello_world ${PROJECT_NAME})
+
+  add_executable(serial_loopback examples/serial_loopback.cpp)
+  target_link_libraries(serial_loopback ${PROJECT_NAME})
+endif(BUILD_EXAMPLES)
