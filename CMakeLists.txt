@@ -30,3 +30,7 @@ if(BUILD_EXAMPLES)
   add_executable(serial_loopback examples/serial_loopback.cpp)
   target_link_libraries(serial_loopback ${PROJECT_NAME})
 endif(BUILD_EXAMPLES)
+
+# ROS release
+install(FILES package.xml DESTINATION share/${PROJECT_NAME})
+
