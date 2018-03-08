@@ -42,7 +42,7 @@ find_package(async_comm REQUIRED)
 include_directories(${async_comm_INCLUDE_DIRS})
 
 add_executable(my_project src/my_project.cpp)
-target_link_libraries(testing ${async_comm_LIBRARIES})
+target_link_libraries(my_project ${async_comm_LIBRARIES})
 ```
 
 ### Including as a submodule
@@ -66,8 +66,8 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 add_subdirectory(lib/async_comm)
 include_directories(lib/async_comm/include)
 
-add_executable(my_program src/my_program.cpp)
-target_link_libraries(my_program async_comm)
+add_executable(my_project src/my_project.cpp)
+target_link_libraries(my_project async_comm)
 ```
 
 ## Usage
