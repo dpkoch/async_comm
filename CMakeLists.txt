@@ -21,16 +21,33 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # examples
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(ASYNC_COMM_BUILD_EXAMPLES "Build examples" OFF)
 
-if(BUILD_EXAMPLES)
+if(ASYNC_COMM_BUILD_EXAMPLES)
   add_executable(udp_hello_world examples/udp_hello_world.cpp)
   target_link_libraries(udp_hello_world ${PROJECT_NAME})
 
   add_executable(serial_loopback examples/serial_loopback.cpp)
   target_link_libraries(serial_loopback ${PROJECT_NAME})
-endif(BUILD_EXAMPLES)
+endif(ASYNC_COMM_BUILD_EXAMPLES)
 
-# ROS release
+# install
+set(LIB_DEST lib/${PROJECT_NAME})
+set(INCLUDE_DEST include)
+
+install(TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION ${LIB_DEST}
+)
+install(DIRECTORY include/${PROJECT_NAME}
+  DESTINATION ${INCLUDE_DEST}
+  FILES_MATCHING PATTERN "*.h"
+)
+
+# install CMake package configuration
+install(EXPORT ${PROJECT_NAME}-targets DESTINATION ${LIB_DEST})
+install(FILES ${PROJECT_NAME}-config.cmake DESTINATION ${LIB_DEST})
+
+# install package.xml for ROS release
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 

@@ -7,25 +7,59 @@ It uses the [Boost.Asio](http://www.boost.org/doc/libs/master/doc/html/boost_asi
 
 ## Including in your project
 
-The following instructions are for a project using Git for version control and CMake for a build system, but should serve as a starting point for other setups.
+There are two ways to use the `async_comm` library in your project:
 
-The easiest way to embed the `async_comm` library in your project is as a [Git submodule](https://git-scm.com/docs/gitsubmodules). For example, to put `async_comm` in the `lib/async_comm directory`, run the following from the root of your project:
+  1. Build and install the library on your system, then use CMake's `find_package()` functionality
+  2. Include the async_comm as a submodule in your project
+
+### System install
+
+First, download and install the library:
+
+```bash
+git clone https://github.com/dpkoch/async_comm.git
+cd async_comm
+mkdir build && cd build/
+cmake .. && make
+sudo make install
+```
+
+Then, in your project do something like this in your CMakeLists.txt:
+
+```CMake
+cmake_minimum_required(VERSION 2.8.11)
+project(my_project)
+
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
+find_package(async_comm REQUIRED)
+include_directories(${async_comm_INCLUDE_DIRS})
+
+add_executable(my_project src/my_project.cpp)
+target_link_libraries(testing ${async_comm_LIBRARIES})
+```
+
+### Including as a submodule
+
+If you don't want to go with the system install option, the next easiest way to embed the `async_comm` library in your project is as a [Git submodule](https://git-scm.com/docs/gitsubmodules). The following instructions are for a project using Git for version control and CMake for a build system, but should serve as a starting point for other setups.
+
+For example, to put `async_comm` in the `lib/async_comm directory`, run the following from the root of your project:
 
 ```bash
 git submodule add https://github.com/dpkoch/async_comm.git lib/async_comm
 ```
 
-Then add the following to your `CMakeLists.txt` to build the `async_comm` library and make the headers accessible in your project:
+Your CMakeLists.txt file would then look something like this:
 
 ```CMake
+cmake_minimum_required(VERSION 2.8.11)
+project(my_project)
+
 set(CMAKE_CXX_FLAGS "-std=c++11")
+
 add_subdirectory(lib/async_comm)
 include_directories(lib/async_comm/include)
-```
 
-Then link your executable to the `async_comm` library with something like
-
-```CMake
 add_executable(my_program src/my_program.cpp)
 target_link_libraries(my_program async_comm)
 ```
@@ -60,7 +94,7 @@ where `serial_` is an instance of `async_comm::Serial`.
 
 ## Examples
 
-There are two simple examples provided in the repository. To build the examples, run CMake with the `-DBUILD_EXAMPLES=ON` flag.
+There are two simple examples provided in the repository. To build the examples, run CMake with the `-DASYNC_COMM_BUILD_EXAMPLES=ON` flag.
 
   - `examples/serial_loopback.cpp`: Designed for use with a USB-to-UART adapter with the RX and TX pins connected together (loopback). Sends a series of bytes out and prints them to the console as they are received back.
   - `examples/udp_hello_world.cpp`: Opens two UDP objects listening on different ports on the local host, and then uses each to send a simple "hello world" message to the other.
