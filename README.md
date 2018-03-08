@@ -12,6 +12,12 @@ There are two ways to use the `async_comm` library in your project:
   1. Build and install the library on your system, then use CMake's `find_package()` functionality
   2. Include the async_comm as a submodule in your project
 
+Either way, you will need to ensure that the Boost library is installed before proceeding:
+
+```bash
+sudo apt -y install libboost-dev
+```
+
 ### System install
 
 First, download and install the library:
