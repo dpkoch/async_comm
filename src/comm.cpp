@@ -79,7 +79,7 @@ void Comm::close()
 
 void Comm::send_bytes(const uint8_t *src, size_t len)
 {
-  assert(len <= MAX_PACKET_LEN);
+  assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE);
 
   WriteBuffer *buffer = new WriteBuffer();
   memcpy(buffer->data, src, len);
@@ -102,7 +102,7 @@ void Comm::async_read()
 {
   if (!is_open()) return;
 
-  do_async_read(boost::asio::buffer(read_buffer_, READ_BUFFER_SIZE),
+  do_async_read(boost::asio::buffer(read_buffer_, ASYNC_COMM_READ_BUFFER_SIZE),
                 boost::bind(&Comm::async_read_end,
                             this,
                             boost::asio::placeholders::error,
