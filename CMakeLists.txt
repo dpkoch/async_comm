@@ -13,7 +13,7 @@ find_package(Threads)
 include_directories(include)
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
   src/comm.cpp
   src/udp.cpp
   src/serial.cpp
@@ -38,6 +38,7 @@ set(INCLUDE_DEST include)
 install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION ${LIB_DEST}
+  LIBRARY DESTINATION ${LIB_DEST}
 )
 install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION ${INCLUDE_DEST}
