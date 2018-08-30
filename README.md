@@ -7,15 +7,59 @@ It uses the [Boost.Asio](http://www.boost.org/doc/libs/master/doc/html/boost_asi
 
 ## Including in your project
 
-There are two ways to use the `async_comm` library in your project:
+There are three ways to use the `async_comm` library in your project:
 
-  1. Build and install the library on your system, then use CMake's `find_package()` functionality
-  2. Include the async_comm as a submodule in your project
+  1. If you'll be using the library in a ROS package, install from the ROS repositories
+  2. Build and install the library on your system, then use CMake's `find_package()` functionality
+  3. Include the async_comm as a submodule in your project
 
-Either way, you will need to ensure that the Boost library is installed before proceeding:
+With the second and third options, you will need to ensure that the Boost library is installed before proceeding:
 
 ```bash
 sudo apt -y install libboost-dev
+```
+
+### ROS install
+
+The `async_comm` library is released as a third-party, non-catkin package for ROS following the guidelines in [REP 136](http://www.ros.org/reps/rep-0136.html). To use the library in your ROS package, first install the library from the ROS repositories:
+
+```bash
+sudo apt install ros-<DISTRO>-async-comm
+```
+
+Replace `<DISTRO>` with your ROS distribution. The library is currently released for kinetic, lunar, and melodic.
+
+Then, add something like the following lines to your package's CMakeLists.txt:
+
+```CMake
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
+find_package(async_comm REQUIRED)
+
+catkin_package(
+  ...
+  DEPENDS async_comm
+)
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  ...
+  ${async_comm_INCLUDE_DIRS}
+)
+
+add_executable(my_node src/my_node.cpp)
+target_link_libraries(my_node ${async_comm_LIBRARIES})
+```
+
+Also be sure to list `async_comm` as a dependency in your package.xml:
+
+```XML
+<?xml version="1.0"?>
+<package format="2">
+  ...
+  <depend>async_comm</depend>
+  ...
+</package>
 ```
 
 ### System install
@@ -30,7 +74,7 @@ cmake .. && make
 sudo make install
 ```
 
-Then, in your project do something like this in your CMakeLists.txt:
+Then, do something like this in your project's CMakeLists.txt:
 
 ```CMake
 cmake_minimum_required(VERSION 2.8.11)
@@ -47,7 +91,7 @@ target_link_libraries(my_project ${async_comm_LIBRARIES})
 
 ### Including as a submodule
 
-If you don't want to go with the system install option, the next easiest way to embed the `async_comm` library in your project is as a [Git submodule](https://git-scm.com/docs/gitsubmodules). The following instructions are for a project using Git for version control and CMake for a build system, but should serve as a starting point for other setups.
+If you don't want to go with the ROS or system install options, the next easiest way to embed the `async_comm` library in your project is as a [Git submodule](https://git-scm.com/docs/gitsubmodules). The following instructions are for a project using Git for version control and CMake for a build system, but should serve as a starting point for other setups.
 
 For example, to put `async_comm` in the `lib/async_comm directory`, run the following from the root of your project:
 
