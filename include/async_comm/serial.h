@@ -63,6 +63,14 @@ public:
   Serial(std::string port, unsigned int baud_rate);
   ~Serial();
 
+
+  /**
+   * @brief Set serial port baud rate
+   * @param baud_rate The baud rate for the serial port (e.g. 115200)
+   * @returns true if successful
+   */
+  bool set_baud_rate(unsigned int baud_rate);
+
 private:
   bool is_open() override;
   bool do_init() override;

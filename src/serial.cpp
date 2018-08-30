@@ -57,6 +57,20 @@ Serial::~Serial()
   do_close();
 }
 
+bool Serial::set_baud_rate(unsigned int baud_rate)
+{
+  baud_rate_ = baud_rate;
+  try
+  {
+    serial_port_.set_option(serial_port_base::baud_rate(baud_rate_));
+  }
+  catch (boost::system::system_error e)
+  {
+    std::cerr << e.what() << std::endl;
+    return false;
+  }
+}
+
 bool Serial::is_open()
 {
   return serial_port_.is_open();

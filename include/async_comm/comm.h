@@ -86,6 +86,12 @@ public:
   void send_bytes(const uint8_t * src, size_t len);
 
   /**
+   * @brief Send a single byte over the port
+   * @param src byte to send
+   */
+  void put_byte(const uint8_t src);
+
+  /**
    * @brief Register a callback function for when bytes are received on the port
    * @param fun Function to call when bytes are received
    */
