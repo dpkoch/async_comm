@@ -69,6 +69,8 @@ bool Serial::set_baud_rate(unsigned int baud_rate)
     std::cerr << e.what() << std::endl;
     return false;
   }
+
+  return true;
 }
 
 bool Serial::is_open()

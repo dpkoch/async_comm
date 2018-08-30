@@ -87,9 +87,9 @@ public:
 
   /**
    * @brief Send a single byte over the port
-   * @param src byte to send
+   * @param data Byte to send
    */
-  void put_byte(const uint8_t src);
+  inline void send_byte(uint8_t data) { send_bytes(&data, 1); }
 
   /**
    * @brief Register a callback function for when bytes are received on the port

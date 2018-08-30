@@ -77,11 +77,6 @@ void Comm::close()
   }
 }
 
-void Comm::put_byte(const uint8_t src)
-{
-  send_bytes(&src, 1);
-}
-
 void Comm::send_bytes(const uint8_t *src, size_t len)
 {
   assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE);

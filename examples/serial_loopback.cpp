@@ -79,10 +79,10 @@ int main(int argc, char** argv)
 
   // test sending bytes one at a time
   std::printf("Transmit individual bytes:\n");
-  for (int i = 0; i < NUM_BYTES; i++)
+  for (uint8_t i = 0; i < NUM_BYTES; i++)
   {
     buffer[i] = i;
-    serial.send_bytes((uint8_t*) &i, 1);
+    serial.send_byte(i);
   }
 
   // wait for all bytes to be received
