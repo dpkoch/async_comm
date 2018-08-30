@@ -33,11 +33,30 @@
 /**
  * @file serial_protocol.cpp
  * @author Daniel Koch <danielpkoch@gmail.com>
+ *
+ * This example implements a simple serial protocol, and tests the async_comm library using that protocol on a serial
+ * loopback (USB-to-UART converter with the RX and TX pins connected together).
+ *
+ * The message defined by the serial protocol has the following format:
+ *
+ * | Field      | Type     | Size (bytes) | Description                                          |
+ * |------------|----------|--------------|------------------------------------------------------|
+ * | Start Byte |          | 1            | Identifies the beginning of a message, value is 0xA5 |
+ * | `id`       | uint32_t | 4            | Sequential message ID                                |
+ * | `v1`       | uint32_t | 4            | The first data field                                 |
+ * | `v2`       | uint32_t | 4            | The second data field                                |
+ * | CRC        | uint8_t  | 1            | Cyclic redundancy check (CRC) byte                   |
+ *
+ * The "payload" of the message is the part that contains the actual data, and consists of the `id`, `v1`, and `v2`
+ * fields.
+ *
+ * The parser is implemented as a finite state machine.
  */
 
+// specify the number of messages to send
 #define NUM_MSGS 40000
-#define BAUD_RATE 921600
 
+// set the read and write buffer sizes for the async_comm library
 #define ASYNC_COMM_READ_BUFFER_SIZE 512
 #define ASYNC_COMM_WRITE_BUFFER_SIZE 256
 
@@ -48,6 +67,7 @@
 
 #include <chrono>
 
+// define attributes of the serial protocol
 #define START_BYTE 0xA5
 
 #define START_BYTE_LEN 1
@@ -55,9 +75,23 @@
 #define CRC_LEN 1
 #define PACKET_LEN (START_BYTE_LEN + PAYLOAD_LEN + CRC_LEN)
 
+// specify relevant serial port options
+#define BAUD_RATE 921600
 #define NUM_START_BITS 1
 #define NUM_STOP_BITS 1
 
+
+/**
+ * @brief Recursively update the cyclic redundancy check (CRC)
+ *
+ * This uses the CRC-8-CCITT polynomial.
+ *
+ * Source: http://www.nongnu.org/avr-libc/user-manual/group__util__crc.html#gab27eaaef6d7fd096bd7d57bf3f9ba083
+ *
+ * @param inCrc The current CRC value. This should be initialized to 0 before processing first byte.
+ * @param inData The byte being processed
+ * @return The new CRC value
+ */
 uint8_t update_crc(uint8_t inCrc, uint8_t inData)
 {
   uint8_t   i;
@@ -80,6 +114,16 @@ uint8_t update_crc(uint8_t inCrc, uint8_t inData)
   return data;
 }
 
+
+/**
+ * @brief Pack message contents into a buffer
+ * @param[out] dst Buffer in which to store the message
+ * @param[in] id ID field of the message
+ * @param[in] v1 First data field of the message
+ * @param[in] v2 Second data field of the message
+ *
+ * @post The specified buffer contains the complete message packet, including start byte and CRC byte
+ */
 void pack_message(uint8_t* dst, uint32_t id, uint32_t v1, uint32_t v2)
 {
   dst[0] = START_BYTE;
@@ -95,6 +139,17 @@ void pack_message(uint8_t* dst, uint32_t id, uint32_t v1, uint32_t v2)
   dst[PACKET_LEN-1] = crc;
 }
 
+
+/**
+ * @brief Unpack the contents of a message payload buffer
+ * @param[in] src The buffer to unpack
+ * @param[out] id ID field of the message
+ * @param[out] v1 First data field of the message
+ * @param[out] v2 Second data field of the message
+ *
+ * @pre Buffer contains a valid message payload
+ * @post Payload contents have been placed into the specified variables
+ */
 void unpack_payload(uint8_t* src, uint32_t *id, uint32_t *v1, uint32_t *v2)
 {
   memcpy(id, src, 4);
@@ -102,8 +157,12 @@ void unpack_payload(uint8_t* src, uint32_t *id, uint32_t *v1, uint32_t *v2)
   memcpy(v2, src+8, 4);
 }
 
-bool received[NUM_MSGS];
+bool received[NUM_MSGS]; //!< Keeps track of which messages we've received back
 
+
+/**
+ * @brief States for the parser state machine
+ */
 enum ParseState
 {
   PARSE_STATE_IDLE,
@@ -111,11 +170,16 @@ enum ParseState
   PARSE_STATE_GOT_PAYLOAD
 };
 
-ParseState parse_state = PARSE_STATE_IDLE;
-uint8_t receive_buffer[PAYLOAD_LEN];
+ParseState parse_state = PARSE_STATE_IDLE; //!< Current state of the parser state machine
+uint8_t receive_buffer[PAYLOAD_LEN]; //!< Buffer for accumulating received payload
 
-int receive_count = 0;
+int receive_count = 0; //!< Keeps track of how many valid messages have been received
 
+
+/**
+ * @brief Passes a received byte through the parser state machine
+ * @param byte The byte to process
+ */
 void parse_byte(uint8_t byte)
 {
   static size_t payload_count;
@@ -154,6 +218,15 @@ void parse_byte(uint8_t byte)
   }
 }
 
+
+/**
+ * @brief Callback function for the async_comm library
+ *
+ * Passes the received bytes through the parser state machine.
+ *
+ * @param buf Received bytes buffer
+ * @param len Number of bytes received
+ */
 void callback(const uint8_t* buf, size_t len)
 {
   for (size_t i = 0; i < len; i++)
@@ -161,6 +234,7 @@ void callback(const uint8_t* buf, size_t len)
     parse_byte(buf[i]);
   }
 }
+
 
 int main(int argc, char** argv)
 {
@@ -187,10 +261,12 @@ int main(int argc, char** argv)
     return 2;
   }
 
+  // initialize variable for tracking which messages we've received
   memset(received, 0, sizeof(received));
 
   auto start = std::chrono::high_resolution_clock::now();
 
+  // pack and send the specified number of messages with unique IDs and data
   uint8_t buffer[PACKET_LEN];
   for (uint32_t i = 0; i < NUM_MSGS; i++)
   {
@@ -199,6 +275,7 @@ int main(int argc, char** argv)
   }
   auto finish_write = std::chrono::high_resolution_clock::now();
 
+  // wait to receive all messages
   while (receive_count < NUM_MSGS);
 
   auto finish_read = std::chrono::high_resolution_clock::now();
@@ -220,6 +297,7 @@ int main(int argc, char** argv)
     }
   }
 
+  // evaluate and print performance
   std::chrono::duration<double, std::milli> write_time = finish_write - start;
   std::chrono::duration<double, std::milli> read_time = finish_read - start;
 

@@ -33,6 +33,9 @@
 /**
  * @file serial_loopback.cpp
  * @author Daniel Koch <danielpkoch@gmail.com>
+ *
+ * This example is designed for use with a USB-to-UART adapter with the RX and TX pins connected together (loopback).
+ * Sends a series of bytes out and prints them to the console as they are received back.
  */
 
 #include <async_comm/serial.h>
@@ -45,6 +48,15 @@
 
 #define NUM_BYTES 64
 
+
+/**
+ * @brief Callback function for the async_comm library
+ *
+ * Prints the received bytes to stdout.
+ *
+ * @param buf Received bytes buffer
+ * @param len Number of bytes received
+ */
 void callback(const uint8_t* buf, size_t len)
 {
   for (size_t i = 0; i < len; i++)
@@ -52,6 +64,7 @@ void callback(const uint8_t* buf, size_t len)
     std::printf("Received byte: %d\n", buf[i]);
   }
 }
+
 
 int main(int argc, char** argv)
 {
