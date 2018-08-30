@@ -104,3 +104,4 @@ There are two simple examples provided in the repository. To build the examples,
 
   - `examples/serial_loopback.cpp`: Designed for use with a USB-to-UART adapter with the RX and TX pins connected together (loopback). Sends a series of bytes out and prints them to the console as they are received back.
   - `examples/udp_hello_world.cpp`: Opens two UDP objects listening on different ports on the local host, and then uses each to send a simple "hello world" message to the other.
+  - `examples/serial_protocol.cpp`: Implements a simple serial protocol and parser for a message that includes two integer values, including a cyclic reduncancy check. Tests the protocol and `async_comm` library over a serial loopback.

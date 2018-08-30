@@ -29,6 +29,9 @@ if(ASYNC_COMM_BUILD_EXAMPLES)
 
   add_executable(serial_loopback examples/serial_loopback.cpp)
   target_link_libraries(serial_loopback ${PROJECT_NAME})
+
+  add_executable(serial_protocol examples/serial_protocol.cpp)
+  target_link_libraries(serial_protocol ${PROJECT_NAME})
 endif(ASYNC_COMM_BUILD_EXAMPLES)
 
 # install
