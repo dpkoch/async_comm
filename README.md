@@ -83,7 +83,7 @@ The constructors for each class require the arguments to specify the details of 
 The interface consists of the following functions:
 
   - `bool init()`: initializes and opens the port or socket
-  - `void register_receive_callback(std::function<void(uint8_t)> fun)`: register a user-defined function to handle a received byte; this function will be called by the `Serial` or `UDP` object every time a new byte is received
+  - `void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun)`: register a user-defined function to handle received bytes; this function will be called by the `Serial` or `UDP` object every time a new data is received
   - `void send_bytes(const uint8_t * src, size_t len)`: send the specified number of bytes from the specified source buffer
   - `void close()`: close the port or socket
 

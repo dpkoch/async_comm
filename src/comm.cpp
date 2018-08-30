@@ -93,7 +93,7 @@ void Comm::send_bytes(const uint8_t *src, size_t len)
   async_write(true);
 }
 
-void Comm::register_receive_callback(std::function<void (uint8_t)> fun)
+void Comm::register_receive_callback(std::function<void(const uint8_t*, size_t)> fun)
 {
   receive_callback_ = fun;
 }
@@ -118,10 +118,7 @@ void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_t
     return;
   }
 
-  for (int i = 0; i < bytes_transferred; i++)
-  {
-    receive_callback_(read_buffer_[i]);
-  }
+  receive_callback_(read_buffer_, bytes_transferred);
 
   async_read();
 }

@@ -38,6 +38,8 @@
 #ifndef ASYNC_COMM_COMM_H
 #define ASYNC_COMM_COMM_H
 
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <mutex>
@@ -93,9 +95,18 @@ public:
 
   /**
    * @brief Register a callback function for when bytes are received on the port
+   *
+   * The callback function needs to accept two parameters. The first is of type `const uint8_t*`, and is a constant
+   * pointer to the data buffer. The second is of type `size_t`, and specifies the number of bytes available in the
+   * buffer.
+   *
+   * @warning The data buffer passed to the callback function will be invalid after the callback function exits. If you
+   * want to store the data for later processing, you must copy the data to a new buffer rather than storing the
+   * pointer to the buffer.
+   *
    * @param fun Function to call when bytes are received
    */
-  void register_receive_callback(std::function<void(uint8_t)> fun);
+  void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun);
 
 protected:
 
@@ -144,7 +155,7 @@ private:
   std::list<WriteBuffer*> write_queue_;
   bool write_in_progress_;
 
-  std::function<void(uint8_t)> receive_callback_;
+  std::function<void(const uint8_t*, size_t)> receive_callback_;
 };
 
 } // namespace async_comm

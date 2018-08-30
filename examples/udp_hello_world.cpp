@@ -43,20 +43,24 @@
 
 #include <chrono>
 #include <thread>
+#include <vector>
 
-void echo(uint8_t byte)
+void callback(const uint8_t* buf, size_t len)
 {
-  std::cout << byte;
+  for (size_t i = 0; i < len; i++)
+  {
+    std::cout << buf[i];
+  }
 }
 
 int main()
 {
   // open UDP ports
   async_comm::UDP udp1("localhost", 14620, "localhost", 14625);
-  udp1.register_receive_callback(&echo);
+  udp1.register_receive_callback(&callback);
 
   async_comm::UDP udp2("localhost", 14625, "localhost", 14620);
-  udp2.register_receive_callback(&echo);
+  udp2.register_receive_callback(&callback);
 
   if (!udp1.init() || !udp2.init())
   {

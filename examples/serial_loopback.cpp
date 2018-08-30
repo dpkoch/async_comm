@@ -45,9 +45,12 @@
 
 #define NUM_BYTES 64
 
-void echo(uint8_t byte)
+void callback(const uint8_t* buf, size_t len)
 {
-  std::printf("Received byte: %d\n", byte);
+  for (size_t i = 0; i < len; i++)
+  {
+    std::printf("Received byte: %d\n", buf[i]);
+  }
 }
 
 int main(int argc, char** argv)
@@ -67,7 +70,7 @@ int main(int argc, char** argv)
 
   // open serial port
   async_comm::Serial serial(port, 115200);
-  serial.register_receive_callback(&echo);
+  serial.register_receive_callback(&callback);
 
   if (!serial.init())
   {
