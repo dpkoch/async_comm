@@ -1,5 +1,6 @@
 # Async Comm Library
 
+[![Build Status](http://build.ros.org/buildStatus/icon?job=Mdev__async_comm__ubuntu_bionic_amd64)](http://build.ros.org/job/Mdev__async_comm__ubuntu_bionic_amd64)
 [![Documentation Status](https://codedocs.xyz/dpkoch/async_comm.svg)](https://codedocs.xyz/dpkoch/async_comm/)
 
 This project provides a C++ library that gives a simple interface for asynchronous serial communications over a serial port or UDP.
