@@ -79,15 +79,17 @@ void Comm::close()
 
 void Comm::send_bytes(const uint8_t *src, size_t len)
 {
-  assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE);
-
-  WriteBuffer *buffer = new WriteBuffer();
-  memcpy(buffer->data, src, len);
-  buffer->len = len;
-
+  for (size_t pos = 0; pos < len; pos += ASYNC_COMM_WRITE_BUFFER_SIZE)
   {
-    mutex_lock lock(mutex_);
-    write_queue_.push_back(buffer);
+    WriteBuffer *buffer = new WriteBuffer();
+    size_t num_bytes = (len - pos) > ASYNC_COMM_WRITE_BUFFER_SIZE ? ASYNC_COMM_WRITE_BUFFER_SIZE : len - pos;
+    memcpy(buffer->data, src + pos, num_bytes);
+    buffer->len = num_bytes;
+
+    {
+      mutex_lock lock(mutex_);
+      write_queue_.push_back(buffer);
+    }
   }
 
   async_write(true);
