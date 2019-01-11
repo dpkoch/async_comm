@@ -59,6 +59,8 @@
 #include <cstdio>
 
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
 
 // specify the number of messages to send
 #define NUM_MSGS 40000
@@ -153,8 +155,6 @@ void unpack_payload(uint8_t* src, uint32_t *id, uint32_t *v1, uint32_t *v2)
   memcpy(v2, src+8, 4);
 }
 
-bool received[NUM_MSGS]; //!< Keeps track of which messages we've received back
-
 
 /**
  * @brief States for the parser state machine
@@ -170,6 +170,11 @@ ParseState parse_state = PARSE_STATE_IDLE; //!< Current state of the parser stat
 uint8_t receive_buffer[PAYLOAD_LEN]; //!< Buffer for accumulating received payload
 
 volatile int receive_count = 0; //!< Keeps track of how many valid messages have been received
+bool received[NUM_MSGS]; //!< Keeps track of which messages we've received back
+
+std::mutex mutex; //!< mutex for synchronization between the main thread and callback thread
+std::condition_variable condition_variable; //!< condition variable used to suspend main thread until all messages have been received back
+volatile bool all_messages_received = false; //!< flag for whether all messages have been received back
 
 
 /**
@@ -208,6 +213,16 @@ void parse_byte(uint8_t byte)
       unpack_payload(receive_buffer, &id, &v1, &v2);
       received[id] = true;
       receive_count++;
+
+      // notify the main thread when all messages have been received
+      if (receive_count >= NUM_MSGS)
+      {
+        {
+          std::unique_lock<std::mutex> lock(mutex);
+          all_messages_received = true;
+        }
+        condition_variable.notify_one();
+      }
     } // otherwise ignore it
     parse_state = PARSE_STATE_IDLE;
     break;
@@ -272,7 +287,10 @@ int main(int argc, char** argv)
   auto finish_write = std::chrono::high_resolution_clock::now();
 
   // wait to receive all messages
-  while (receive_count < NUM_MSGS);
+  {
+    std::unique_lock<std::mutex> lock(mutex);
+    condition_variable.wait(lock, []{ return all_messages_received; });
+  }
 
   auto finish_read = std::chrono::high_resolution_clock::now();
 
