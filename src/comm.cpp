@@ -79,17 +79,12 @@ void Comm::close()
 
 void Comm::send_bytes(const uint8_t *src, size_t len)
 {
-  for (size_t pos = 0; pos < len; pos += ASYNC_COMM_WRITE_BUFFER_SIZE)
-  {
-    WriteBuffer *buffer = new WriteBuffer();
-    size_t num_bytes = (len - pos) > ASYNC_COMM_WRITE_BUFFER_SIZE ? ASYNC_COMM_WRITE_BUFFER_SIZE : len - pos;
-    memcpy(buffer->data, src + pos, num_bytes);
-    buffer->len = num_bytes;
+  mutex_lock lock(mutex_);
 
-    {
-      mutex_lock lock(mutex_);
-      write_queue_.push_back(buffer);
-    }
+  for (size_t pos = 0; pos < len; pos += WRITE_BUFFER_SIZE)
+  {
+    size_t num_bytes = (len - pos) > WRITE_BUFFER_SIZE ? WRITE_BUFFER_SIZE : (len - pos);
+    write_queue_.push_back(new WriteBuffer(src + pos, num_bytes));
   }
 
   async_write(true);
@@ -104,7 +99,7 @@ void Comm::async_read()
 {
   if (!is_open()) return;
 
-  do_async_read(boost::asio::buffer(read_buffer_, ASYNC_COMM_READ_BUFFER_SIZE),
+  do_async_read(boost::asio::buffer(read_buffer_, READ_BUFFER_SIZE),
                 boost::bind(&Comm::async_read_end,
                             this,
                             boost::asio::placeholders::error,

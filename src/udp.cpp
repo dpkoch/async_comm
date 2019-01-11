@@ -81,8 +81,8 @@ bool UDP::do_init()
     socket_.bind(bind_endpoint_);
 
     socket_.set_option(udp::socket::reuse_address(true));
-    socket_.set_option(udp::socket::send_buffer_size(ASYNC_COMM_WRITE_BUFFER_SIZE*1024));
-    socket_.set_option(udp::socket::receive_buffer_size(ASYNC_COMM_READ_BUFFER_SIZE*1024));
+    socket_.set_option(udp::socket::send_buffer_size(WRITE_BUFFER_SIZE*1024));
+    socket_.set_option(udp::socket::receive_buffer_size(READ_BUFFER_SIZE*1024));
   }
   catch (boost::system::system_error e)
   {

@@ -48,14 +48,6 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-#ifndef ASYNC_COMM_READ_BUFFER_SIZE
-  #define ASYNC_COMM_READ_BUFFER_SIZE 1024
-#endif
-
-#ifndef ASYNC_COMM_WRITE_BUFFER_SIZE
-  #define ASYNC_COMM_WRITE_BUFFER_SIZE 1024
-#endif
-
 namespace async_comm
 {
 
@@ -110,6 +102,9 @@ public:
 
 protected:
 
+  static constexpr size_t READ_BUFFER_SIZE = 1024;
+  static constexpr size_t WRITE_BUFFER_SIZE = 1024;
+
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;
   virtual void do_close() = 0;
@@ -124,7 +119,7 @@ private:
 
   struct WriteBuffer
   {
-    uint8_t data[ASYNC_COMM_WRITE_BUFFER_SIZE];
+    uint8_t data[WRITE_BUFFER_SIZE];
     size_t len;
     size_t pos;
 
@@ -132,7 +127,7 @@ private:
 
     WriteBuffer(const uint8_t * buf, uint16_t len) : len(len), pos(0)
     {
-      assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE); //! \todo Do something less catastrophic here
+      assert(len <= WRITE_BUFFER_SIZE); // only checks in debug mode
       memcpy(data, buf, len);
     }
 
@@ -151,7 +146,7 @@ private:
   std::thread io_thread_;
   std::recursive_mutex mutex_;
 
-  uint8_t read_buffer_[ASYNC_COMM_READ_BUFFER_SIZE];
+  uint8_t read_buffer_[READ_BUFFER_SIZE];
   std::list<WriteBuffer*> write_queue_;
   bool write_in_progress_;
 

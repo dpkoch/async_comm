@@ -53,19 +53,15 @@
  * The parser is implemented as a finite state machine.
  */
 
-// specify the number of messages to send
-#define NUM_MSGS 40000
-
-// set the read and write buffer sizes for the async_comm library
-#define ASYNC_COMM_READ_BUFFER_SIZE 512
-#define ASYNC_COMM_WRITE_BUFFER_SIZE 256
-
 #include <async_comm/serial.h>
 
 #include <cstdint>
 #include <cstdio>
 
 #include <chrono>
+
+// specify the number of messages to send
+#define NUM_MSGS 40000
 
 // define attributes of the serial protocol
 #define START_BYTE 0xA5
