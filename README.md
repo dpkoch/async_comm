@@ -138,7 +138,7 @@ Very simple example programs are provided to illustrate the usage as described b
 One tricky part is registering the member function of a class as the receive callback. This is accomplished using `std::bind`. For example, if I want to register the `receive` function of `MyClass` from within the class, I would use
 
 ```C++
-serial_.register_receive_callback(std::bind(&MyClass::receive, this, std::placeholders::_1));
+serial_.register_receive_callback(std::bind(&MyClass::receive, this, std::placeholders::_1, std::placeholders::_2));
 ```
 
 where `serial_` is an instance of `async_comm::Serial`.
