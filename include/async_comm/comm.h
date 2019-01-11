@@ -157,17 +157,25 @@ private:
   void async_write(bool check_write_state);
   void async_write_end(const boost::system::error_code& error, size_t bytes_transferred);
 
+  void run();
   void process_callbacks();
+  void shutdown();
 
+  std::thread main_thread_;
   std::thread io_thread_;
   std::thread callback_thread_;
+
+  std::mutex main_mutex_;
+  std::condition_variable main_condition_variable_;
+  bool error_;
+  bool shutdown_;
 
   uint8_t read_buffer_[READ_BUFFER_SIZE];
   std::list<ReadBuffer> read_queue_;
   std::mutex callback_mutex_;
-  std::condition_variable condition_variable_;
+  std::condition_variable callback_condition_variable_;
   bool new_data_;
-  bool shutdown_requested_;
+  bool callback_shutdown_;
 
   std::list<WriteBuffer> write_queue_;
   std::recursive_mutex write_mutex_;

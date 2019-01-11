@@ -45,14 +45,17 @@ namespace async_comm
 
 Comm::Comm() :
   io_service_(),
+  error_(false),
+  shutdown_(false),
   new_data_(false),
-  shutdown_requested_(false),
+  callback_shutdown_(false),
   write_in_progress_(false)
 {
 }
 
 Comm::~Comm()
 {
+  shutdown();
 }
 
 bool Comm::init()
@@ -60,35 +63,16 @@ bool Comm::init()
   if (!do_init())
     return false;
 
-  callback_thread_ = std::thread(std::bind(&Comm::process_callbacks, this));
-
-  async_read();
-  io_thread_ = std::thread(boost::bind(&boost::asio::io_service::run, &this->io_service_));
+  main_thread_ = std::thread(std::bind(&Comm::run, this));
 
   return true;
 }
 
 void Comm::close()
 {
-  // send shutdown signal to callback thread
-  {
-    std::unique_lock<std::mutex> lock(callback_mutex_);
-    shutdown_requested_ = true;
-  }
-  condition_variable_.notify_one();
-
   io_service_.stop();
   do_close();
-
-  if (io_thread_.joinable())
-  {
-    io_thread_.join();
-  }
-
-  if (callback_thread_.joinable())
-  {
-    callback_thread_.join();
-  }
+  shutdown();
 }
 
 void Comm::send_bytes(const uint8_t *src, size_t len)
@@ -124,8 +108,12 @@ void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_t
 {
   if (error)
   {
-    std::cerr << error.message() << std::endl;
-    close();
+    std::cerr << "Boost.Asio Error: " << error.message() << std::endl;
+    {
+      std::unique_lock<std::mutex> lock(main_mutex_);
+      error_ = true;
+    }
+    main_condition_variable_.notify_one();
     return;
   }
 
@@ -134,7 +122,7 @@ void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_t
     read_queue_.emplace_back(read_buffer_, bytes_transferred);
     new_data_ = true;
   }
-  condition_variable_.notify_one();
+  callback_condition_variable_.notify_one();
 
   async_read();
 }
@@ -161,8 +149,12 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
 {
   if (error)
   {
-    std::cerr << error.message() << std::endl;
-    close();
+    std::cerr << "Boost.Asio Error: " << error.message() << std::endl;
+    {
+      std::unique_lock<std::mutex> lock(main_mutex_);
+      error_ = true;
+    }
+    main_condition_variable_.notify_one();
     return;
   }
 
@@ -186,6 +178,40 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
     async_write(false);
 }
 
+void Comm::run()
+{
+  callback_thread_ = std::thread(std::bind(&Comm::process_callbacks, this));
+
+  async_read();
+  io_thread_ = std::thread(boost::bind(&boost::asio::io_service::run, &this->io_service_));
+
+  std::unique_lock<std::mutex> lock(main_mutex_);
+  main_condition_variable_.wait(lock, [this]{ return error_ || shutdown_; });
+
+  lock.unlock();
+
+  // send shutdown signal to io thread
+  io_service_.stop();
+
+  // send shutdown signal to callback thread
+  {
+    std::unique_lock<std::mutex> lock(callback_mutex_);
+    callback_shutdown_ = true;
+  }
+  callback_condition_variable_.notify_one();
+
+  // join threads
+  if (io_thread_.joinable())
+  {
+    io_thread_.join();
+  }
+
+  if (callback_thread_.joinable())
+  {
+    callback_thread_.join();
+  }
+}
+
 void Comm::process_callbacks()
 {
   std::list<ReadBuffer> local_queue;
@@ -194,10 +220,10 @@ void Comm::process_callbacks()
   {
     // wait for either new data or a shutdown request
     std::unique_lock<std::mutex> lock(callback_mutex_);
-    condition_variable_.wait(lock, [this]{ return new_data_ || shutdown_requested_; });
+    callback_condition_variable_.wait(lock, [this]{ return new_data_ || callback_shutdown_; });
 
     // if shutdown requested, end thread execution
-    if (shutdown_requested_)
+    if (callback_shutdown_)
     {
       break;
     }
@@ -216,6 +242,20 @@ void Comm::process_callbacks()
       receive_callback_(buffer.data, buffer.len);
       local_queue.pop_front();
     }
+  }
+}
+
+void Comm::shutdown()
+{
+  {
+    std::unique_lock<std::mutex> lock(main_mutex_);
+    shutdown_ = true;
+  }
+  main_condition_variable_.notify_one();
+
+  if (main_thread_.joinable())
+  {
+    main_thread_.join();
   }
 }
 
