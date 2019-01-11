@@ -100,7 +100,7 @@ void Comm::send_bytes(const uint8_t *src, size_t len)
   for (size_t pos = 0; pos < len; pos += WRITE_BUFFER_SIZE)
   {
     size_t num_bytes = (len - pos) > WRITE_BUFFER_SIZE ? WRITE_BUFFER_SIZE : (len - pos);
-    write_queue_.push_back(new WriteBuffer(src + pos, num_bytes));
+    write_queue_.emplace_back(src + pos, num_bytes);
   }
 
   async_write(true);
@@ -151,8 +151,8 @@ void Comm::async_write(bool check_write_state)
     return;
 
   write_in_progress_ = true;
-  WriteBuffer *buffer = write_queue_.front();
-  do_async_write(boost::asio::buffer(buffer->dpos(), buffer->nbytes()),
+  WriteBuffer& buffer = write_queue_.front();
+  do_async_write(boost::asio::buffer(buffer.dpos(), buffer.nbytes()),
                  boost::bind(&Comm::async_write_end,
                              this,
                              boost::asio::placeholders::error,
@@ -175,12 +175,11 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
     return;
   }
 
-  WriteBuffer *buffer = write_queue_.front();
-  buffer->pos += bytes_transferred;
-  if (buffer->nbytes() == 0)
+  WriteBuffer& buffer = write_queue_.front();
+  buffer.pos += bytes_transferred;
+  if (buffer.nbytes() == 0)
   {
     write_queue_.pop_front();
-    delete buffer;
   }
 
   if (write_queue_.empty())

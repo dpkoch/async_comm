@@ -170,7 +170,7 @@ private:
   uint8_t read_buffer_[READ_BUFFER_SIZE];
   std::list<ReadBuffer> read_queue_;
 
-  std::list<WriteBuffer*> write_queue_;
+  std::list<WriteBuffer> write_queue_;
   bool write_in_progress_;
 
   std::function<void(const uint8_t*, size_t)> receive_callback_;
