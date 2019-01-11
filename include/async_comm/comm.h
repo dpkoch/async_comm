@@ -38,6 +38,7 @@
 #ifndef ASYNC_COMM_COMM_H
 #define ASYNC_COMM_COMM_H
 
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -117,6 +118,18 @@ protected:
 
 private:
 
+  struct ReadBuffer
+  {
+    uint8_t data[READ_BUFFER_SIZE];
+    size_t len;
+
+    ReadBuffer(const uint8_t * buf, size_t len) : len(len)
+    {
+      assert(len <= READ_BUFFER_SIZE); // only checks in debug mode
+      memcpy(data, buf, len);
+    }
+  };
+
   struct WriteBuffer
   {
     uint8_t data[WRITE_BUFFER_SIZE];
@@ -125,7 +138,7 @@ private:
 
     WriteBuffer() : len(0), pos(0) {}
 
-    WriteBuffer(const uint8_t * buf, uint16_t len) : len(len), pos(0)
+    WriteBuffer(const uint8_t * buf, size_t len) : len(len), pos(0)
     {
       assert(len <= WRITE_BUFFER_SIZE); // only checks in debug mode
       memcpy(data, buf, len);
@@ -137,16 +150,26 @@ private:
   };
 
   typedef std::lock_guard<std::recursive_mutex> mutex_lock;
+
   void async_read();
   void async_read_end(const boost::system::error_code& error, size_t bytes_transferred);
 
   void async_write(bool check_write_state);
   void async_write_end(const boost::system::error_code& error, size_t bytes_transferred);
 
+  void process_callbacks();
+
   std::thread io_thread_;
-  std::recursive_mutex mutex_;
+  std::thread callback_thread_;
+  std::recursive_mutex write_mutex_;
+  std::mutex callback_mutex_;
+  std::condition_variable condition_variable_;
+  bool new_data_;
+  bool shutdown_requested_;
 
   uint8_t read_buffer_[READ_BUFFER_SIZE];
+  std::list<ReadBuffer> read_queue_;
+
   std::list<WriteBuffer*> write_queue_;
   bool write_in_progress_;
 

@@ -45,6 +45,8 @@ namespace async_comm
 
 Comm::Comm() :
   io_service_(),
+  new_data_(false),
+  shutdown_requested_(false),
   write_in_progress_(false)
 {
 }
@@ -58,6 +60,8 @@ bool Comm::init()
   if (!do_init())
     return false;
 
+  callback_thread_ = std::thread(std::bind(&Comm::process_callbacks, this));
+
   async_read();
   io_thread_ = std::thread(boost::bind(&boost::asio::io_service::run, &this->io_service_));
 
@@ -66,7 +70,14 @@ bool Comm::init()
 
 void Comm::close()
 {
-  mutex_lock lock(mutex_);
+  // send shutdown signal to callback thread
+  {
+    std::unique_lock<std::mutex> lock(callback_mutex_);
+    shutdown_requested_ = true;
+  }
+  condition_variable_.notify_one();
+
+  mutex_lock lock(write_mutex_);
 
   io_service_.stop();
   do_close();
@@ -75,11 +86,16 @@ void Comm::close()
   {
     io_thread_.join();
   }
+
+  if (callback_thread_.joinable())
+  {
+    callback_thread_.join();
+  }
 }
 
 void Comm::send_bytes(const uint8_t *src, size_t len)
 {
-  mutex_lock lock(mutex_);
+  mutex_lock lock(write_mutex_);
 
   for (size_t pos = 0; pos < len; pos += WRITE_BUFFER_SIZE)
   {
@@ -115,7 +131,12 @@ void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_t
     return;
   }
 
-  receive_callback_(read_buffer_, bytes_transferred);
+//  receive_callback_(read_buffer_, bytes_transferred);
+  std::unique_lock<std::mutex> lock(callback_mutex_);
+  read_queue_.emplace_back(read_buffer_, bytes_transferred);
+  new_data_ = true;
+  lock.unlock();
+  condition_variable_.notify_one();
 
   async_read();
 }
@@ -125,7 +146,7 @@ void Comm::async_write(bool check_write_state)
   if (check_write_state && write_in_progress_)
     return;
 
-  mutex_lock lock(mutex_);
+  mutex_lock lock(write_mutex_);
   if (write_queue_.empty())
     return;
 
@@ -147,7 +168,7 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
     return;
   }
 
-  mutex_lock lock(mutex_);
+  mutex_lock lock(write_mutex_);
   if (write_queue_.empty())
   {
     write_in_progress_ = false;
@@ -166,6 +187,40 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
     write_in_progress_ = false;
   else
     async_write(false);
+}
+
+void Comm::process_callbacks()
+{
+  std::list<ReadBuffer> local_queue;
+
+  while (true)
+  {
+
+    // wait for either new data or a shutdown request
+    std::unique_lock<std::mutex> lock(callback_mutex_);
+    condition_variable_.wait(lock, [this]{ return new_data_ || shutdown_requested_; });
+
+    // if shutdown requested, end thread execution
+    if (shutdown_requested_)
+    {
+      break;
+    }
+
+    // move data to local buffer
+    local_queue.splice(local_queue.end(), read_queue_);
+
+    // release mutex to allow continued asynchronous read operations
+    new_data_ = false;
+    lock.unlock();
+
+    // execute callback for all new data
+    while (!local_queue.empty())
+    {
+      ReadBuffer buffer = local_queue.front();
+      receive_callback_(buffer.data, buffer.len);
+      local_queue.pop_front();
+    }
+  }
 }
 
 } // namespace async_comm
