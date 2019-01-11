@@ -131,11 +131,11 @@ void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_t
     return;
   }
 
-//  receive_callback_(read_buffer_, bytes_transferred);
-  std::unique_lock<std::mutex> lock(callback_mutex_);
-  read_queue_.emplace_back(read_buffer_, bytes_transferred);
-  new_data_ = true;
-  lock.unlock();
+  {
+    std::unique_lock<std::mutex> lock(callback_mutex_);
+    read_queue_.emplace_back(read_buffer_, bytes_transferred);
+    new_data_ = true;
+  }
   condition_variable_.notify_one();
 
   async_read();
@@ -194,7 +194,6 @@ void Comm::process_callbacks()
 
   while (true)
   {
-
     // wait for either new data or a shutdown request
     std::unique_lock<std::mutex> lock(callback_mutex_);
     condition_variable_.wait(lock, [this]{ return new_data_ || shutdown_requested_; });

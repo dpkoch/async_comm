@@ -161,16 +161,16 @@ private:
 
   std::thread io_thread_;
   std::thread callback_thread_;
-  std::recursive_mutex write_mutex_;
+
+  uint8_t read_buffer_[READ_BUFFER_SIZE];
+  std::list<ReadBuffer> read_queue_;
   std::mutex callback_mutex_;
   std::condition_variable condition_variable_;
   bool new_data_;
   bool shutdown_requested_;
 
-  uint8_t read_buffer_[READ_BUFFER_SIZE];
-  std::list<ReadBuffer> read_queue_;
-
   std::list<WriteBuffer> write_queue_;
+  std::recursive_mutex write_mutex_;
   bool write_in_progress_;
 
   std::function<void(const uint8_t*, size_t)> receive_callback_;
