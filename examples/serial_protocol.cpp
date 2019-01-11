@@ -169,7 +169,7 @@ enum ParseState
 ParseState parse_state = PARSE_STATE_IDLE; //!< Current state of the parser state machine
 uint8_t receive_buffer[PAYLOAD_LEN]; //!< Buffer for accumulating received payload
 
-int receive_count = 0; //!< Keeps track of how many valid messages have been received
+volatile int receive_count = 0; //!< Keeps track of how many valid messages have been received
 
 
 /**
