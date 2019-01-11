@@ -77,8 +77,6 @@ void Comm::close()
   }
   condition_variable_.notify_one();
 
-  mutex_lock lock(write_mutex_);
-
   io_service_.stop();
   do_close();
 
