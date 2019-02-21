@@ -2,8 +2,8 @@
 Changelog for package async_comm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2019-02-21)
+------------------
 * Some cleanup
 * Process callbacks on a separate thread
 * Made buffer sizes constant, removed faulty mechanism for overriding
