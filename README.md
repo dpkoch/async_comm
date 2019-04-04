@@ -117,18 +117,19 @@ target_link_libraries(my_project async_comm)
 
 ## Usage
 
-There are two classes that you'll use directly as a user:
+There are three classes that you'll use directly as a user:
 
   - `async_comm::Serial`: for communication over a serial port
   - `async_comm::UDP`: for communication over a UDP socket
+  - `async_comm::TCPClient`: for communication over a TCP socket (client)
 
-Both of these classes have the same interface and inherit from the `async_comm::Comm` base class.
-The constructors for each class require the arguments to specify the details of the serial port or UDP socket.
+All classes have the same interface and inherit from the `async_comm::Comm` base class.
+The constructors for each class require the arguments to specify the details of the serial port, UDP or TCP socket.
 
 The interface consists of the following functions:
 
   - `bool init()`: initializes and opens the port or socket
-  - `void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun)`: register a user-defined function to handle received bytes; this function will be called by the `Serial` or `UDP` object every time a new data is received
+  - `void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun)`: register a user-defined function to handle received bytes; this function will be called by the `Serial`, `UDP` or `TCPClient` object every time a new data is received
   - `void send_bytes(const uint8_t * src, size_t len)`: send the specified number of bytes from the specified source buffer
   - `void close()`: close the port or socket
 
@@ -150,3 +151,4 @@ There are three examples provided in the repository. The first two are very simp
   - `examples/serial_loopback.cpp`: Designed for use with a USB-to-UART adapter with the RX and TX pins connected together (loopback). Sends a series of bytes out and prints them to the console as they are received back.
   - `examples/udp_hello_world.cpp`: Opens two UDP objects listening on different ports on the local host, and then uses each to send a simple "hello world" message to the other.
   - `examples/serial_protocol.cpp`: Implements a simple serial protocol and parser for a message that includes two integer values, including a cyclic reduncancy check. Tests the protocol and `async_comm` library over a serial loopback.
+  - `examples/tcp_client_hello_world.cpp`: Opens a TCP client that sends "hello world" messages. Example only runs with a valid running TCP/IP server. Server can be started using [netcat](https://en.wikipedia.org/wiki/Netcat): `nc -l 16140`.
