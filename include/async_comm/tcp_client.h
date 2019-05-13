@@ -50,17 +50,15 @@ namespace async_comm
 
 /**
  * @class TCPClient
- * @brief Asynchronous communication class for a TCPClient socket
+ * @brief Asynchronous communication class for a TCP client
  */
 class TCPClient : public Comm
 {
 public:
   /**
-   * @brief Bind a UPD socket
-   * @param bind_host The bind host where this application is listening (usually "localhost")
-   * @param bind_port The bind port where this application is listening
-   * @param remote_host The remote host to communicate with
-   * @param remote_port The port on the remote host
+   * @brief Connect to a TCP socket as a client
+   * @param host The host where the TCP server is running
+   * @param port The port on which the TCP server is listening
    */
   TCPClient(std::string host = DEFAULT_HOST, uint16_t port = DEFAULT_PORT);
   ~TCPClient();

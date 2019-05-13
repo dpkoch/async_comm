@@ -56,7 +56,7 @@ class UDP : public Comm
 {
 public:
   /**
-   * @brief Bind a UPD socket
+   * @brief Bind a UDP socket
    * @param bind_host The bind host where this application is listening (usually "localhost")
    * @param bind_port The bind port where this application is listening
    * @param remote_host The remote host to communicate with
