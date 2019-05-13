@@ -1,6 +1,7 @@
 *~
 *.swp
 *.user
+.vscode/
 
 /build/
 /doc/
