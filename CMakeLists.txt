@@ -17,6 +17,7 @@ add_library(${PROJECT_NAME} SHARED
   src/comm.cpp
   src/udp.cpp
   src/serial.cpp
+  src/tcp_client.cpp
 )
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
@@ -32,6 +33,9 @@ if(ASYNC_COMM_BUILD_EXAMPLES)
 
   add_executable(serial_protocol examples/serial_protocol.cpp)
   target_link_libraries(serial_protocol ${PROJECT_NAME})
+
+  add_executable(tcp_client_hello_world examples/tcp_client_hello_world.cpp)
+  target_link_libraries(tcp_client_hello_world ${PROJECT_NAME})
 endif(ASYNC_COMM_BUILD_EXAMPLES)
 
 # install
