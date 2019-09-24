@@ -31,64 +31,37 @@
  */
 
 /**
- * @file serial.h
+ * @file message_handler.h
  * @author Daniel Koch <danielpkoch@gmail.com>
  */
 
-#ifndef ASYNC_COMM_SERIAL_H
-#define ASYNC_COMM_SERIAL_H
+#ifndef ASYNC_COMM_MESSAGE_HANDLER_H
+#define ASYNC_COMM_MESSAGE_HANDLER_H
 
+#include <iostream>
 #include <string>
-
-#include <boost/asio.hpp>
-#include <boost/function.hpp>
-
-#include <async_comm/message_handler.h>
-#include <async_comm/comm.h>
 
 namespace async_comm
 {
 
 /**
- * @class Serial
- * @brief Asynchronous communication class for a serial port
+ * @class MessageHandler
+ * @brief Abstract base class for message handler
+ *
+ * The implementations of this class define how messages are displayed, logged,
+ * etc. To create custom behavior, derive from this base class and override the
+ * pure virtual functions.
  */
-class Serial : public Comm
+class MessageHandler
 {
 public:
-  /**
-   * @brief Open a serial port
-   * @param port The port to open (e.g. "/dev/ttyUSB0")
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @param message_handler Custom message handler, or omit for default handler
-   *
-   */
-  Serial(std::string port, unsigned int baud_rate, MessageHandler& message_handler = default_message_handler_);
-  ~Serial();
-
-
-  /**
-   * @brief Set serial port baud rate
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @return True if successful
-   */
-  bool set_baud_rate(unsigned int baud_rate);
-
-private:
-  bool is_open() override;
-  bool do_init() override;
-  void do_close() override;
-  void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code&, size_t)> handler) override;
-  void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code&, size_t)> handler) override;
-
-  std::string port_;
-  unsigned int baud_rate_;
-
-  boost::asio::serial_port serial_port_;
+  virtual void debug(const std::string& message) = 0;
+  virtual void  info(const std::string& message) = 0;
+  virtual void  warn(const std::string& message) = 0;
+  virtual void error(const std::string& message) = 0;
+  virtual void fatal(const std::string& message) = 0;
 };
 
 } // namespace async_comm
 
-#endif // ASYNC_COMM_SERIAL_H
+#endif // ASYNC_COMM_MESSAGE_HANDLER_H

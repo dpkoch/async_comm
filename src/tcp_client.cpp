@@ -44,8 +44,8 @@ using boost::asio::ip::tcp;
 namespace async_comm
 {
 
-TCPClient::TCPClient(std::string host, uint16_t port) :
-  Comm(),
+TCPClient::TCPClient(std::string host, uint16_t port, MessageHandler& message_handler) :
+  Comm(message_handler),
   host_(host),
   port_(port),
   socket_(io_service_)
@@ -80,7 +80,7 @@ bool TCPClient::do_init()
   }
   catch (boost::system::system_error e)
   {
-    std::cerr << e.what() << std::endl;
+    message_handler_.error(e.what());
     return false;
   }
 

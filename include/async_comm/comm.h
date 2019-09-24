@@ -49,6 +49,8 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
+#include <async_comm/message_handler.h>
+
 namespace async_comm
 {
 
@@ -59,7 +61,11 @@ namespace async_comm
 class Comm
 {
 public:
-  Comm();
+  /**
+   * @brief Set up asynchronous communication base class
+   * @param message_handler Custom message handler, or omit for default handler
+   */
+  Comm(MessageHandler& message_handler = default_message_handler_);
   virtual ~Comm();
 
   /**
@@ -106,6 +112,17 @@ protected:
   static constexpr size_t READ_BUFFER_SIZE = 1024;
   static constexpr size_t WRITE_BUFFER_SIZE = 1024;
 
+  class DefaultMessageHandler : public MessageHandler
+  {
+  public:
+    inline void debug(const std::string &message) override { std::cout << "[async_comm][DEBUG]: " << message << std::endl; }
+    inline void info(const std::string &message) override { std::cout << "[async_comm][INFO]: " << message << std::endl; }
+    inline void warn(const std::string &message) override { std::cerr << "[async_comm][WARN]: " << message << std::endl; }
+    inline void error(const std::string &message) override { std::cerr << "[async_comm][ERROR]: " << message << std::endl; }
+    inline void fatal(const std::string &message) override { std::cerr << "[async_comm][FATAL]: " << message << std::endl; }
+  };
+  static DefaultMessageHandler default_message_handler_;
+
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;
   virtual void do_close() = 0;
@@ -114,6 +131,7 @@ protected:
   virtual void do_async_write(const boost::asio::const_buffers_1 &buffer,
                               boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
 
+  MessageHandler& message_handler_;
   boost::asio::io_service io_service_;
 
 private:

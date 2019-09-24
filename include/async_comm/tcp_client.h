@@ -43,6 +43,7 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
+#include <async_comm/message_handler.h>
 #include <async_comm/comm.h>
 
 namespace async_comm
@@ -59,8 +60,10 @@ public:
    * @brief Connect to a TCP socket as a client
    * @param host The host where the TCP server is running
    * @param port The port on which the TCP server is listening
+   * @param message_handler Custom message handler, or omit for default handler
    */
-  TCPClient(std::string host = DEFAULT_HOST, uint16_t port = DEFAULT_PORT);
+  TCPClient(std::string host = DEFAULT_HOST, uint16_t port = DEFAULT_PORT,
+            MessageHandler& message_handler = default_message_handler_);
   ~TCPClient();
 
 private:

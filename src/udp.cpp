@@ -45,8 +45,9 @@ namespace async_comm
 {
 
 
-UDP::UDP(std::string bind_host, uint16_t bind_port, std::string remote_host, uint16_t remote_port) :
-  Comm(),
+UDP::UDP(std::string bind_host, uint16_t bind_port, std::string remote_host, uint16_t remote_port,
+         MessageHandler& message_handler) :
+  Comm(message_handler),
   bind_host_(bind_host),
   bind_port_(bind_port),
   remote_host_(remote_host),
@@ -86,7 +87,7 @@ bool UDP::do_init()
   }
   catch (boost::system::system_error e)
   {
-    std::cerr << e.what() << std::endl;
+    message_handler_.error(e.what());
     return false;
   }
 

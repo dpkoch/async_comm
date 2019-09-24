@@ -44,8 +44,8 @@ using boost::asio::serial_port_base;
 namespace async_comm
 {
 
-Serial::Serial(std::string port, unsigned int baud_rate) :
-  Comm(),
+Serial::Serial(std::string port, unsigned int baud_rate, MessageHandler& message_handler) :
+  Comm(message_handler),
   port_(port),
   baud_rate_(baud_rate),
   serial_port_(io_service_)
@@ -66,7 +66,7 @@ bool Serial::set_baud_rate(unsigned int baud_rate)
   }
   catch (boost::system::system_error e)
   {
-    std::cerr << e.what() << std::endl;
+    message_handler_.error(e.what());
     return false;
   }
 
@@ -91,7 +91,7 @@ bool Serial::do_init()
   }
   catch (boost::system::system_error e)
   {
-    std::cerr << e.what() << std::endl;
+    message_handler_.error(e.what());
     return false;
   }
 

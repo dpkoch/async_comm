@@ -43,7 +43,10 @@
 namespace async_comm
 {
 
-Comm::Comm() :
+Comm::DefaultMessageHandler Comm::default_message_handler_;
+
+Comm::Comm(MessageHandler& message_handler) :
+  message_handler_(message_handler),
   io_service_(),
   new_data_(false),
   shutdown_requested_(false),
@@ -124,7 +127,7 @@ void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_t
 {
   if (error)
   {
-    std::cerr << error.message() << std::endl;
+    message_handler_.error(error.message());
     close();
     return;
   }
@@ -161,7 +164,7 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
 {
   if (error)
   {
-    std::cerr << error.message() << std::endl;
+    message_handler_.error(error.message());
     close();
     return;
   }
