@@ -49,16 +49,15 @@
 #include <boost/function.hpp>
 
 #ifndef ASYNC_COMM_READ_BUFFER_SIZE
-  #define ASYNC_COMM_READ_BUFFER_SIZE 1024
+#define ASYNC_COMM_READ_BUFFER_SIZE 1024
 #endif
 
 #ifndef ASYNC_COMM_WRITE_BUFFER_SIZE
-  #define ASYNC_COMM_WRITE_BUFFER_SIZE 1024
+#define ASYNC_COMM_WRITE_BUFFER_SIZE 1024
 #endif
 
 namespace async_comm
 {
-
 /**
  * @class Comm
  * @brief Abstract base class for an asynchronous communication port
@@ -85,7 +84,7 @@ public:
    * @param src Address of the buffer
    * @param len Number of bytes to send
    */
-  void send_bytes(const uint8_t * src, size_t len);
+  void send_bytes(const uint8_t* src, size_t len);
 
   /**
    * @brief Send a single byte over the port
@@ -96,32 +95,32 @@ public:
   /**
    * @brief Register a callback function for when bytes are received on the port
    *
-   * The callback function needs to accept two parameters. The first is of type `const uint8_t*`, and is a constant
-   * pointer to the data buffer. The second is of type `size_t`, and specifies the number of bytes available in the
-   * buffer.
+   * The callback function needs to accept two parameters. The first is of type `const uint8_t*`,
+   * and is a constant pointer to the data buffer. The second is of type `size_t`, and specifies the
+   * number of bytes available in the buffer.
    *
-   * @warning The data buffer passed to the callback function will be invalid after the callback function exits. If you
-   * want to store the data for later processing, you must copy the data to a new buffer rather than storing the
-   * pointer to the buffer.
+   * @warning The data buffer passed to the callback function will be invalid after the callback
+   * function exits. If you want to store the data for later processing, you must copy the data to a
+   * new buffer rather than storing the pointer to the buffer.
    *
    * @param fun Function to call when bytes are received
    */
   void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun);
 
 protected:
-
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;
   virtual void do_close() = 0;
-  virtual void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                             boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
-  virtual void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                              boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
+  virtual void do_async_read(
+      const boost::asio::mutable_buffers_1& buffer,
+      boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
+  virtual void do_async_write(
+      const boost::asio::const_buffers_1& buffer,
+      boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
 
   boost::asio::io_service io_service_;
 
 private:
-
   struct WriteBuffer
   {
     uint8_t data[ASYNC_COMM_WRITE_BUFFER_SIZE];
@@ -130,13 +129,13 @@ private:
 
     WriteBuffer() : len(0), pos(0) {}
 
-    WriteBuffer(const uint8_t * buf, uint16_t len) : len(len), pos(0)
+    WriteBuffer(const uint8_t* buf, uint16_t len) : len(len), pos(0)
     {
-      assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE); //! \todo Do something less catastrophic here
+      assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE);  //! \todo Do something less catastrophic here
       memcpy(data, buf, len);
     }
 
-    const uint8_t * dpos() const { return data + pos; }
+    const uint8_t* dpos() const { return data + pos; }
 
     size_t nbytes() const { return len - pos; }
   };
@@ -158,6 +157,6 @@ private:
   std::function<void(const uint8_t*, size_t)> receive_callback_;
 };
 
-} // namespace async_comm
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_COMM_H
+#endif  // ASYNC_COMM_COMM_H

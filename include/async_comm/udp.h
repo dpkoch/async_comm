@@ -47,7 +47,6 @@
 
 namespace async_comm
 {
-
 /**
  * @class UDP
  * @brief Asynchronous communication class for a UDP socket
@@ -75,10 +74,12 @@ private:
   bool is_open() override;
   bool do_init() override;
   void do_close() override;
-  void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code&, size_t)> handler) override;
-  void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+  void do_async_read(
+      const boost::asio::mutable_buffers_1 &buffer,
+      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
+  void do_async_write(
+      const boost::asio::const_buffers_1 &buffer,
+      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
 
   std::string bind_host_;
   uint16_t bind_port_;
@@ -91,6 +92,6 @@ private:
   boost::asio::ip::udp::endpoint remote_endpoint_;
 };
 
-} // namespace async_comm
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_UDP_H
+#endif  // ASYNC_COMM_UDP_H

@@ -37,25 +37,18 @@
 
 #include <async_comm/serial.h>
 
-#include<iostream>
+#include <iostream>
 
 using boost::asio::serial_port_base;
 
 namespace async_comm
 {
-
-Serial::Serial(std::string port, unsigned int baud_rate) :
-  Comm(),
-  port_(port),
-  baud_rate_(baud_rate),
-  serial_port_(io_service_)
+Serial::Serial(std::string port, unsigned int baud_rate)
+    : Comm(), port_(port), baud_rate_(baud_rate), serial_port_(io_service_)
 {
 }
 
-Serial::~Serial()
-{
-  do_close();
-}
+Serial::~Serial() { do_close(); }
 
 bool Serial::set_baud_rate(unsigned int baud_rate)
 {
@@ -74,10 +67,7 @@ bool Serial::set_baud_rate(unsigned int baud_rate)
   return true;
 }
 
-bool Serial::is_open()
-{
-  return serial_port_.is_open();
-}
+bool Serial::is_open() { return serial_port_.is_open(); }
 
 bool Serial::do_init()
 {
@@ -99,21 +89,19 @@ bool Serial::do_init()
   return true;
 }
 
-void Serial::do_close()
-{
-  serial_port_.close();
-}
+void Serial::do_close() { serial_port_.close(); }
 
 void Serial::do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                           boost::function<void (const boost::system::error_code&, size_t)> handler)
+                           boost::function<void(const boost::system::error_code &, size_t)> handler)
 {
   serial_port_.async_read_some(buffer, handler);
 }
 
-void Serial::do_async_write(const boost::asio::const_buffers_1 &buffer,
-                            boost::function<void (const boost::system::error_code&, size_t)> handler)
+void Serial::do_async_write(
+    const boost::asio::const_buffers_1 &buffer,
+    boost::function<void(const boost::system::error_code &, size_t)> handler)
 {
   serial_port_.async_write_some(buffer, handler);
 }
 
-} // namespace async_comm
+}  // namespace async_comm

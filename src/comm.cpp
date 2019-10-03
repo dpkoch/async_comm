@@ -37,21 +37,14 @@
 
 #include <async_comm/comm.h>
 
-#include <iostream>
 #include <boost/bind.hpp>
+#include <iostream>
 
 namespace async_comm
 {
+Comm::Comm() : io_service_(), write_in_progress_(false) {}
 
-Comm::Comm() :
-  io_service_(),
-  write_in_progress_(false)
-{
-}
-
-Comm::~Comm()
-{
-}
+Comm::~Comm() {}
 
 bool Comm::init()
 {
@@ -93,19 +86,18 @@ void Comm::send_bytes(const uint8_t *src, size_t len)
   async_write(true);
 }
 
-void Comm::register_receive_callback(std::function<void(const uint8_t*, size_t)> fun)
+void Comm::register_receive_callback(std::function<void(const uint8_t *, size_t)> fun)
 {
   receive_callback_ = fun;
 }
 
 void Comm::async_read()
 {
-  if (!is_open()) return;
+  if (!is_open())
+    return;
 
   do_async_read(boost::asio::buffer(read_buffer_, ASYNC_COMM_READ_BUFFER_SIZE),
-                boost::bind(&Comm::async_read_end,
-                            this,
-                            boost::asio::placeholders::error,
+                boost::bind(&Comm::async_read_end, this, boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred));
 }
 
@@ -135,9 +127,7 @@ void Comm::async_write(bool check_write_state)
   write_in_progress_ = true;
   WriteBuffer *buffer = write_queue_.front();
   do_async_write(boost::asio::buffer(buffer->dpos(), buffer->nbytes()),
-                 boost::bind(&Comm::async_write_end,
-                             this,
-                             boost::asio::placeholders::error,
+                 boost::bind(&Comm::async_write_end, this, boost::asio::placeholders::error,
                              boost::asio::placeholders::bytes_transferred));
 }
 
@@ -171,4 +161,4 @@ void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_
     async_write(false);
 }
 
-} // namespace async_comm
+}  // namespace async_comm

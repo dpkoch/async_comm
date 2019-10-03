@@ -47,7 +47,6 @@
 
 namespace async_comm
 {
-
 /**
  * @class Serial
  * @brief Asynchronous communication class for a serial port
@@ -63,7 +62,6 @@ public:
   Serial(std::string port, unsigned int baud_rate);
   ~Serial();
 
-
   /**
    * @brief Set serial port baud rate
    * @param baud_rate The baud rate for the serial port (e.g. 115200)
@@ -75,10 +73,12 @@ private:
   bool is_open() override;
   bool do_init() override;
   void do_close() override;
-  void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code&, size_t)> handler) override;
-  void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+  void do_async_read(
+      const boost::asio::mutable_buffers_1 &buffer,
+      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
+  void do_async_write(
+      const boost::asio::const_buffers_1 &buffer,
+      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
 
   std::string port_;
   unsigned int baud_rate_;
@@ -86,6 +86,6 @@ private:
   boost::asio::serial_port serial_port_;
 };
 
-} // namespace async_comm
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_SERIAL_H
+#endif  // ASYNC_COMM_SERIAL_H

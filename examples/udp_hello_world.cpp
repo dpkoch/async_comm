@@ -34,8 +34,8 @@
  * @file udp_hello_world.cpp
  * @author Daniel Koch <danielpkoch@gmail.com>
  *
- * This example opens two UDP objects listening on different ports on the local host, and then uses each to send a
- * simple "hello world" message to the other.
+ * This example opens two UDP objects listening on different ports on the local host, and then uses
+ * each to send a simple "hello world" message to the other.
  */
 
 #include <async_comm/udp.h>
@@ -47,7 +47,6 @@
 #include <chrono>
 #include <thread>
 #include <vector>
-
 
 /**
  * @brief Callback function for the async_comm library
@@ -64,7 +63,6 @@ void callback(const uint8_t* buf, size_t len)
     std::cout << buf[i];
   }
 }
-
 
 int main()
 {
@@ -83,7 +81,7 @@ int main()
 
   // send message one direction
   char message1[] = "hello world 1!";
-  udp2.send_bytes((uint8_t*) message1, std::strlen(message1));
+  udp2.send_bytes((uint8_t*)message1, std::strlen(message1));
 
   // wait for all bytes to be received
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -91,7 +89,7 @@ int main()
 
   // send message the other direction
   char message2[] = "hello world 2!";
-  udp1.send_bytes((uint8_t*) message2, std::strlen(message2));
+  udp1.send_bytes((uint8_t*)message2, std::strlen(message2));
 
   // wait for all bytes to be received
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
