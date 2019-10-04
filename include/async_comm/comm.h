@@ -20,14 +20,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -38,6 +39,7 @@
 #ifndef ASYNC_COMM_COMM_H
 #define ASYNC_COMM_COMM_H
 
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -48,17 +50,10 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-#ifndef ASYNC_COMM_READ_BUFFER_SIZE
-  #define ASYNC_COMM_READ_BUFFER_SIZE 1024
-#endif
-
-#ifndef ASYNC_COMM_WRITE_BUFFER_SIZE
-  #define ASYNC_COMM_WRITE_BUFFER_SIZE 1024
-#endif
+#include <async_comm/message_handler.h>
 
 namespace async_comm
 {
-
 /**
  * @class Comm
  * @brief Abstract base class for an asynchronous communication port
@@ -66,7 +61,12 @@ namespace async_comm
 class Comm
 {
 public:
-  Comm();
+  /**
+   * @brief Set up asynchronous communication base class
+   * @param message_handler Custom message handler, or omit for default
+   * handler
+   */
+  Comm(MessageHandler &message_handler = default_message_handler_);
   virtual ~Comm();
 
   /**
@@ -85,7 +85,7 @@ public:
    * @param src Address of the buffer
    * @param len Number of bytes to send
    */
-  void send_bytes(const uint8_t * src, size_t len);
+  void send_bytes(const uint8_t *src, size_t len);
 
   /**
    * @brief Send a single byte over the port
@@ -94,70 +94,123 @@ public:
   inline void send_byte(uint8_t data) { send_bytes(&data, 1); }
 
   /**
-   * @brief Register a callback function for when bytes are received on the port
+   * @brief Register a callback function for when bytes are received on the
+   * port
    *
-   * The callback function needs to accept two parameters. The first is of type `const uint8_t*`, and is a constant
-   * pointer to the data buffer. The second is of type `size_t`, and specifies the number of bytes available in the
-   * buffer.
+   * The callback function needs to accept two parameters. The first is of
+   * type `const uint8_t*`, and is a constant pointer to the data buffer. The
+   * second is of type `size_t`, and specifies the number of bytes available
+   * in the buffer.
    *
-   * @warning The data buffer passed to the callback function will be invalid after the callback function exits. If you
-   * want to store the data for later processing, you must copy the data to a new buffer rather than storing the
-   * pointer to the buffer.
+   * @warning The data buffer passed to the callback function will be invalid
+   * after the callback function exits. If you want to store the data for
+   * later processing, you must copy the data to a new buffer rather than
+   * storing the pointer to the buffer.
    *
    * @param fun Function to call when bytes are received
    */
-  void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun);
+  void register_receive_callback(std::function<void(const uint8_t *, size_t)> fun);
 
 protected:
+  static constexpr size_t READ_BUFFER_SIZE = 1024;
+  static constexpr size_t WRITE_BUFFER_SIZE = 1024;
+
+  class DefaultMessageHandler : public MessageHandler
+  {
+  public:
+    inline void debug(const std::string &message) override
+    {
+      std::cout << "[async_comm][DEBUG]: " << message << std::endl;
+    }
+    inline void info(const std::string &message) override
+    {
+      std::cout << "[async_comm][INFO]: " << message << std::endl;
+    }
+    inline void warn(const std::string &message) override
+    {
+      std::cerr << "[async_comm][WARN]: " << message << std::endl;
+    }
+    inline void error(const std::string &message) override
+    {
+      std::cerr << "[async_comm][ERROR]: " << message << std::endl;
+    }
+    inline void fatal(const std::string &message) override
+    {
+      std::cerr << "[async_comm][FATAL]: " << message << std::endl;
+    }
+  };
+  static DefaultMessageHandler default_message_handler_;
 
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;
   virtual void do_close() = 0;
   virtual void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                             boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
+                             boost::function<void(const boost::system::error_code &, size_t)> handler);
   virtual void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                              boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
+                              boost::function<void(const boost::system::error_code &, size_t)> handler);
 
+  MessageHandler &message_handler_;
   boost::asio::io_service io_service_;
 
 private:
+  struct ReadBuffer
+  {
+    uint8_t data[READ_BUFFER_SIZE];
+    size_t len;
+
+    ReadBuffer(const uint8_t *buf, size_t len) : len(len)
+    {
+      assert(len <= READ_BUFFER_SIZE);  // only checks in debug mode
+      memcpy(data, buf, len);
+    }
+  };
 
   struct WriteBuffer
   {
-    uint8_t data[ASYNC_COMM_WRITE_BUFFER_SIZE];
+    uint8_t data[WRITE_BUFFER_SIZE];
     size_t len;
     size_t pos;
 
     WriteBuffer() : len(0), pos(0) {}
 
-    WriteBuffer(const uint8_t * buf, uint16_t len) : len(len), pos(0)
+    WriteBuffer(const uint8_t *buf, size_t len) : len(len), pos(0)
     {
-      assert(len <= ASYNC_COMM_WRITE_BUFFER_SIZE); //! \todo Do something less catastrophic here
+      assert(len <= WRITE_BUFFER_SIZE);  // only checks in debug mode
       memcpy(data, buf, len);
     }
 
-    const uint8_t * dpos() const { return data + pos; }
+    const uint8_t *dpos() const { return data + pos; }
 
     size_t nbytes() const { return len - pos; }
   };
 
   typedef std::lock_guard<std::recursive_mutex> mutex_lock;
+
   void async_read();
-  void async_read_end(const boost::system::error_code& error, size_t bytes_transferred);
+  void async_read_end(const boost::system::error_code &error, size_t bytes_transferred);
 
   void async_write(bool check_write_state);
-  void async_write_end(const boost::system::error_code& error, size_t bytes_transferred);
+  void async_write_end(const boost::system::error_code &error, size_t bytes_transferred);
+
+  void process_callbacks();
 
   std::thread io_thread_;
-  std::recursive_mutex mutex_;
+  std::thread callback_thread_;
 
-  uint8_t read_buffer_[ASYNC_COMM_READ_BUFFER_SIZE];
-  std::list<WriteBuffer*> write_queue_;
+  uint8_t read_buffer_[READ_BUFFER_SIZE];
+  std::list<ReadBuffer> read_queue_;
+  std::mutex callback_mutex_;
+  std::condition_variable condition_variable_;
+  bool new_data_;
+  bool shutdown_requested_;
+
+  std::list<WriteBuffer> write_queue_;
+  std::recursive_mutex write_mutex_;
   bool write_in_progress_;
 
-  std::function<void(const uint8_t*, size_t)> receive_callback_;
+  std::function<void(const uint8_t *, size_t)> receive_callback_;
 };
 
-} // namespace async_comm
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_COMM_H
+#endif  // ASYNC_COMM_COMM_H

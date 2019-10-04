@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD-3 License)
  *
- * Copyright (c) 2018 Daniel Koch.
+ * Copyright (c) 2019 Rein Appeldoorn.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,60 +32,48 @@
  */
 
 /**
- * @file udp.cpp
- * @author Daniel Koch <danielpkoch@gmail.com>
+ * @file tcp_client.cpp
+ * @author Rein Appeldoorn <reinzor@gmail.com>
  */
 
-#include <async_comm/udp.h>
+#include <async_comm/tcp_client.h>
 
 #include <iostream>
 
-using boost::asio::ip::udp;
+using boost::asio::ip::tcp;
 
 namespace async_comm
 {
-UDP::UDP(std::string bind_host,
-         uint16_t bind_port,
-         std::string remote_host,
-         uint16_t remote_port,
-         MessageHandler &message_handler)
-    : Comm(message_handler),
-      bind_host_(bind_host),
-      bind_port_(bind_port),
-      remote_host_(remote_host),
-      remote_port_(remote_port),
-      socket_(io_service_)
+TCPClient::TCPClient(std::string host, uint16_t port, MessageHandler &message_handler)
+    : Comm(message_handler), host_(host), port_(port), socket_(io_service_)
 {
 }
 
-UDP::~UDP()
+TCPClient::~TCPClient()
 {
   do_close();
 }
 
-bool UDP::is_open()
+bool TCPClient::is_open()
 {
   return socket_.is_open();
 }
 
-bool UDP::do_init()
+bool TCPClient::do_init()
 {
   try
   {
-    udp::resolver resolver(io_service_);
+    tcp::resolver resolver(io_service_);
 
-    bind_endpoint_ = *resolver.resolve({udp::v4(), bind_host_, ""});
-    bind_endpoint_.port(bind_port_);
+    endpoint_ = *resolver.resolve({tcp::v4(), host_, ""});
+    endpoint_.port(port_);
+    socket_.open(tcp::v4());
 
-    remote_endpoint_ = *resolver.resolve({udp::v4(), remote_host_, ""});
-    remote_endpoint_.port(remote_port_);
+    socket_.connect(endpoint_);
 
-    socket_.open(udp::v4());
-    socket_.bind(bind_endpoint_);
-
-    socket_.set_option(udp::socket::reuse_address(true));
-    socket_.set_option(udp::socket::send_buffer_size(WRITE_BUFFER_SIZE * 1024));
-    socket_.set_option(udp::socket::receive_buffer_size(READ_BUFFER_SIZE * 1024));
+    socket_.set_option(tcp::socket::reuse_address(true));
+    socket_.set_option(tcp::socket::send_buffer_size(WRITE_BUFFER_SIZE * 1024));
+    socket_.set_option(tcp::socket::receive_buffer_size(READ_BUFFER_SIZE * 1024));
   }
   catch (boost::system::system_error e)
   {
@@ -96,21 +84,21 @@ bool UDP::do_init()
   return true;
 }
 
-void UDP::do_close()
+void TCPClient::do_close()
 {
   socket_.close();
 }
 
-void UDP::do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                        boost::function<void(const boost::system::error_code &, size_t)> handler)
+void TCPClient::do_async_read(const boost::asio::mutable_buffers_1 &buffer,
+                              boost::function<void(const boost::system::error_code &, size_t)> handler)
 {
-  socket_.async_receive_from(buffer, remote_endpoint_, handler);
+  socket_.async_receive(buffer, handler);
 }
 
-void UDP::do_async_write(const boost::asio::const_buffers_1 &buffer,
-                         boost::function<void(const boost::system::error_code &, size_t)> handler)
+void TCPClient::do_async_write(const boost::asio::const_buffers_1 &buffer,
+                               boost::function<void(const boost::system::error_code &, size_t)> handler)
 {
-  socket_.async_send_to(buffer, remote_endpoint_, handler);
+  socket_.async_send(buffer, handler);
 }
 
 }  // namespace async_comm

@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD-3 License)
  *
- * Copyright (c) 2018 Daniel Koch.
+ * Copyright (c) 2019 Rein Appeldoorn.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,63 +32,60 @@
  */
 
 /**
- * @file serial.h
- * @author Daniel Koch <danielpkoch@gmail.com>
+ * @file tcp_client_hello_world.cpp
+ * @author Rein Appeldoorn <reinzor@gmail.com>
+ *
+ * This example opens a TCP client that sends "hello world" messages.
  */
 
-#ifndef ASYNC_COMM_SERIAL_H
-#define ASYNC_COMM_SERIAL_H
+#include <async_comm/tcp_client.h>
 
-#include <string>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 
-#include <boost/asio.hpp>
-#include <boost/function.hpp>
+#include <chrono>
+#include <thread>
+#include <vector>
 
-#include <async_comm/comm.h>
-#include <async_comm/message_handler.h>
-
-namespace async_comm
-{
 /**
- * @class Serial
- * @brief Asynchronous communication class for a serial port
+ * @brief Callback function for the async_comm library
+ *
+ * Prints the received bytes to stdout.
+ *
+ * @param buf Received bytes buffer
+ * @param len Number of bytes received
  */
-class Serial : public Comm
+void callback(const uint8_t* buf, size_t len)
 {
-public:
-  /**
-   * @brief Open a serial port
-   * @param port The port to open (e.g. "/dev/ttyUSB0")
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @param message_handler Custom message handler, or omit for default
-   * handler
-   *
-   */
-  Serial(std::string port, unsigned int baud_rate, MessageHandler &message_handler = default_message_handler_);
-  ~Serial();
+  for (size_t i = 0; i < len; i++)
+  {
+    std::cout << buf[i];
+  }
+}
 
-  /**
-   * @brief Set serial port baud rate
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @return True if successful
-   */
-  bool set_baud_rate(unsigned int baud_rate);
+int main()
+{
+  // open TCP connection
+  async_comm::TCPClient tcp_client("localhost", 16140);
+  tcp_client.register_receive_callback(&callback);
 
-private:
-  bool is_open() override;
-  bool do_init() override;
-  void do_close() override;
-  void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code &, size_t)> handler) override;
-  void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
+  if (!tcp_client.init())
+  {
+    std::cout << "Failed to initialize TCP client" << std::endl;
+    return 1;
+  }
 
-  std::string port_;
-  unsigned int baud_rate_;
+  // send message one direction
+  for (size_t i = 0; i < 10; ++i)
+  {
+    std::string msg = "hello world " + std::to_string(i) + "!";
+    tcp_client.send_bytes((uint8_t*)msg.data(), msg.size());
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
 
-  boost::asio::serial_port serial_port_;
-};
+  // close connection
+  tcp_client.close();
 
-}  // namespace async_comm
-
-#endif  // ASYNC_COMM_SERIAL_H
+  return 0;
+}

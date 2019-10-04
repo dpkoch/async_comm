@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD-3 License)
  *
- * Copyright (c) 2018 Daniel Koch.
+ * Copyright (c) 2019 Rein Appeldoorn.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,12 @@
  */
 
 /**
- * @file serial.h
- * @author Daniel Koch <danielpkoch@gmail.com>
+ * @file tcp_client.h
+ * @author Rein Appeldoorn <reinzor@gmail.com>
  */
 
-#ifndef ASYNC_COMM_SERIAL_H
-#define ASYNC_COMM_SERIAL_H
+#ifndef ASYNC_COMM_TCP_CLIENT_H
+#define ASYNC_COMM_TCP_CLIENT_H
 
 #include <string>
 
@@ -50,31 +50,28 @@
 namespace async_comm
 {
 /**
- * @class Serial
- * @brief Asynchronous communication class for a serial port
+ * @class TCPClient
+ * @brief Asynchronous communication class for a TCP client
  */
-class Serial : public Comm
+class TCPClient : public Comm
 {
 public:
   /**
-   * @brief Open a serial port
-   * @param port The port to open (e.g. "/dev/ttyUSB0")
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
+   * @brief Connect to a TCP socket as a client
+   * @param host The host where the TCP server is running
+   * @param port The port on which the TCP server is listening
    * @param message_handler Custom message handler, or omit for default
    * handler
-   *
    */
-  Serial(std::string port, unsigned int baud_rate, MessageHandler &message_handler = default_message_handler_);
-  ~Serial();
-
-  /**
-   * @brief Set serial port baud rate
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @return True if successful
-   */
-  bool set_baud_rate(unsigned int baud_rate);
+  TCPClient(std::string host = DEFAULT_HOST,
+            uint16_t port = DEFAULT_PORT,
+            MessageHandler &message_handler = default_message_handler_);
+  ~TCPClient();
 
 private:
+  static constexpr auto DEFAULT_HOST = "localhost";
+  static constexpr uint16_t DEFAULT_PORT = 16140;
+
   bool is_open() override;
   bool do_init() override;
   void do_close() override;
@@ -83,12 +80,13 @@ private:
   void do_async_write(const boost::asio::const_buffers_1 &buffer,
                       boost::function<void(const boost::system::error_code &, size_t)> handler) override;
 
-  std::string port_;
-  unsigned int baud_rate_;
+  std::string host_;
+  uint16_t port_;
 
-  boost::asio::serial_port serial_port_;
+  boost::asio::ip::tcp::socket socket_;
+  boost::asio::ip::tcp::endpoint endpoint_;
 };
 
 }  // namespace async_comm
 
-#endif  // ASYNC_COMM_SERIAL_H
+#endif  // ASYNC_COMM_TCP_CLIENT_H

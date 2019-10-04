@@ -32,63 +32,40 @@
  */
 
 /**
- * @file serial.h
+ * @file message_handler_ros.h
  * @author Daniel Koch <danielpkoch@gmail.com>
  */
 
-#ifndef ASYNC_COMM_SERIAL_H
-#define ASYNC_COMM_SERIAL_H
+#ifndef ASYNC_COMM_MESSAGE_HANDLER_ROS_H
+#define ASYNC_COMM_MESSAGE_HANDLER_ROS_H
 
-#include <string>
-
-#include <boost/asio.hpp>
-#include <boost/function.hpp>
-
-#include <async_comm/comm.h>
 #include <async_comm/message_handler.h>
+
+#include <ros/ros.h>
 
 namespace async_comm
 {
+namespace util
+{
 /**
- * @class Serial
- * @brief Asynchronous communication class for a serial port
+ * @class MessageHandlerROS
+ * @brief Message handler implementation for ROS environments
+ *
+ * This is a convenience message handler implementation for ROS-based projects.
+ * The implementation simply forwards messages to the appropriate rosconsole
+ * loggers.
  */
-class Serial : public Comm
+class MessageHandlerROS : public MessageHandler
 {
 public:
-  /**
-   * @brief Open a serial port
-   * @param port The port to open (e.g. "/dev/ttyUSB0")
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @param message_handler Custom message handler, or omit for default
-   * handler
-   *
-   */
-  Serial(std::string port, unsigned int baud_rate, MessageHandler &message_handler = default_message_handler_);
-  ~Serial();
-
-  /**
-   * @brief Set serial port baud rate
-   * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @return True if successful
-   */
-  bool set_baud_rate(unsigned int baud_rate);
-
-private:
-  bool is_open() override;
-  bool do_init() override;
-  void do_close() override;
-  void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code &, size_t)> handler) override;
-  void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
-
-  std::string port_;
-  unsigned int baud_rate_;
-
-  boost::asio::serial_port serial_port_;
+  inline void debug(const std::string &message) override { ROS_DEBUG("[async_comm]: %s", message.c_str()); }
+  inline void info(const std::string &message) override { ROS_INFO("[async_comm]: %s", message.c_str()); }
+  inline void warn(const std::string &message) override { ROS_WARN("[async_comm]: %s", message.c_str()); }
+  inline void error(const std::string &message) override { ROS_ERROR("[async_comm]: %s", message.c_str()); }
+  inline void fatal(const std::string &message) override { ROS_FATAL("[async_comm]: %s", message.c_str()); }
 };
 
+}  // namespace util
 }  // namespace async_comm
 
-#endif  // ASYNC_COMM_SERIAL_H
+#endif  // ASYNC_COMM_MESSAGE_HANDLER_ROS_H
