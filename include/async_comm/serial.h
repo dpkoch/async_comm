@@ -20,14 +20,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -43,12 +44,11 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-#include <async_comm/message_handler.h>
 #include <async_comm/comm.h>
+#include <async_comm/message_handler.h>
 
 namespace async_comm
 {
-
 /**
  * @class Serial
  * @brief Asynchronous communication class for a serial port
@@ -60,12 +60,12 @@ public:
    * @brief Open a serial port
    * @param port The port to open (e.g. "/dev/ttyUSB0")
    * @param baud_rate The baud rate for the serial port (e.g. 115200)
-   * @param message_handler Custom message handler, or omit for default handler
+   * @param message_handler Custom message handler, or omit for default
+   * handler
    *
    */
-  Serial(std::string port, unsigned int baud_rate, MessageHandler& message_handler = default_message_handler_);
+  Serial(std::string port, unsigned int baud_rate, MessageHandler &message_handler = default_message_handler_);
   ~Serial();
-
 
   /**
    * @brief Set serial port baud rate
@@ -79,9 +79,9 @@ private:
   bool do_init() override;
   void do_close() override;
   void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+                     boost::function<void(const boost::system::error_code &, size_t)> handler) override;
   void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+                      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
 
   std::string port_;
   unsigned int baud_rate_;
@@ -89,6 +89,6 @@ private:
   boost::asio::serial_port serial_port_;
 };
 
-} // namespace async_comm
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_SERIAL_H
+#endif  // ASYNC_COMM_SERIAL_H

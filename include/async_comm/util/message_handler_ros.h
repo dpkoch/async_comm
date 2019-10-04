@@ -20,14 +20,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -46,25 +47,25 @@ namespace async_comm
 {
 namespace util
 {
-
 /**
  * @class MessageHandlerROS
  * @brief Message handler implementation for ROS environments
  *
  * This is a convenience message handler implementation for ROS-based projects.
- * The implementation simply forwards messages to the appropriate rosconsole loggers.
+ * The implementation simply forwards messages to the appropriate rosconsole
+ * loggers.
  */
 class MessageHandlerROS : public MessageHandler
 {
 public:
   inline void debug(const std::string &message) override { ROS_DEBUG("[async_comm]: %s", message.c_str()); }
-  inline void  info(const std::string &message) override { ROS_INFO("[async_comm]: %s", message.c_str()); }
-  inline void  warn(const std::string &message) override { ROS_WARN("[async_comm]: %s", message.c_str()); }
+  inline void info(const std::string &message) override { ROS_INFO("[async_comm]: %s", message.c_str()); }
+  inline void warn(const std::string &message) override { ROS_WARN("[async_comm]: %s", message.c_str()); }
   inline void error(const std::string &message) override { ROS_ERROR("[async_comm]: %s", message.c_str()); }
   inline void fatal(const std::string &message) override { ROS_FATAL("[async_comm]: %s", message.c_str()); }
 };
 
-} // namespace util
-} // namespace async_comm
+}  // namespace util
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_MESSAGE_HANDLER_ROS_H
+#endif  // ASYNC_COMM_MESSAGE_HANDLER_ROS_H

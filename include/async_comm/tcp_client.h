@@ -20,14 +20,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -43,12 +44,11 @@
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 
-#include <async_comm/message_handler.h>
 #include <async_comm/comm.h>
+#include <async_comm/message_handler.h>
 
 namespace async_comm
 {
-
 /**
  * @class TCPClient
  * @brief Asynchronous communication class for a TCP client
@@ -60,10 +60,12 @@ public:
    * @brief Connect to a TCP socket as a client
    * @param host The host where the TCP server is running
    * @param port The port on which the TCP server is listening
-   * @param message_handler Custom message handler, or omit for default handler
+   * @param message_handler Custom message handler, or omit for default
+   * handler
    */
-  TCPClient(std::string host = DEFAULT_HOST, uint16_t port = DEFAULT_PORT,
-            MessageHandler& message_handler = default_message_handler_);
+  TCPClient(std::string host = DEFAULT_HOST,
+            uint16_t port = DEFAULT_PORT,
+            MessageHandler &message_handler = default_message_handler_);
   ~TCPClient();
 
 private:
@@ -74,9 +76,9 @@ private:
   bool do_init() override;
   void do_close() override;
   void do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                     boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+                     boost::function<void(const boost::system::error_code &, size_t)> handler) override;
   void do_async_write(const boost::asio::const_buffers_1 &buffer,
-                      boost::function<void(const boost::system::error_code&, size_t)> handler) override;
+                      boost::function<void(const boost::system::error_code &, size_t)> handler) override;
 
   std::string host_;
   uint16_t port_;
@@ -85,6 +87,6 @@ private:
   boost::asio::ip::tcp::endpoint endpoint_;
 };
 
-} // namespace async_comm
+}  // namespace async_comm
 
-#endif // ASYNC_COMM_TCP_CLIENT_H
+#endif  // ASYNC_COMM_TCP_CLIENT_H

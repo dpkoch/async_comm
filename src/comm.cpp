@@ -20,14 +20,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -37,26 +38,23 @@
 
 #include <async_comm/comm.h>
 
-#include <iostream>
 #include <boost/bind.hpp>
+#include <iostream>
 
 namespace async_comm
 {
-
 Comm::DefaultMessageHandler Comm::default_message_handler_;
 
-Comm::Comm(MessageHandler& message_handler) :
-  message_handler_(message_handler),
-  io_service_(),
-  new_data_(false),
-  shutdown_requested_(false),
-  write_in_progress_(false)
+Comm::Comm(MessageHandler& message_handler)
+    : message_handler_(message_handler),
+      io_service_(),
+      new_data_(false),
+      shutdown_requested_(false),
+      write_in_progress_(false)
 {
 }
 
-Comm::~Comm()
-{
-}
+Comm::~Comm() {}
 
 bool Comm::init()
 {
@@ -94,7 +92,7 @@ void Comm::close()
   }
 }
 
-void Comm::send_bytes(const uint8_t *src, size_t len)
+void Comm::send_bytes(const uint8_t* src, size_t len)
 {
   mutex_lock lock(write_mutex_);
 
@@ -114,16 +112,15 @@ void Comm::register_receive_callback(std::function<void(const uint8_t*, size_t)>
 
 void Comm::async_read()
 {
-  if (!is_open()) return;
+  if (!is_open())
+    return;
 
   do_async_read(boost::asio::buffer(read_buffer_, READ_BUFFER_SIZE),
-                boost::bind(&Comm::async_read_end,
-                            this,
-                            boost::asio::placeholders::error,
+                boost::bind(&Comm::async_read_end, this, boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred));
 }
 
-void Comm::async_read_end(const boost::system::error_code &error, size_t bytes_transferred)
+void Comm::async_read_end(const boost::system::error_code& error, size_t bytes_transferred)
 {
   if (error)
   {
@@ -154,13 +151,11 @@ void Comm::async_write(bool check_write_state)
   write_in_progress_ = true;
   WriteBuffer& buffer = write_queue_.front();
   do_async_write(boost::asio::buffer(buffer.dpos(), buffer.nbytes()),
-                 boost::bind(&Comm::async_write_end,
-                             this,
-                             boost::asio::placeholders::error,
+                 boost::bind(&Comm::async_write_end, this, boost::asio::placeholders::error,
                              boost::asio::placeholders::bytes_transferred));
 }
 
-void Comm::async_write_end(const boost::system::error_code &error, size_t bytes_transferred)
+void Comm::async_write_end(const boost::system::error_code& error, size_t bytes_transferred)
 {
   if (error)
   {
@@ -197,7 +192,7 @@ void Comm::process_callbacks()
   {
     // wait for either new data or a shutdown request
     std::unique_lock<std::mutex> lock(callback_mutex_);
-    condition_variable_.wait(lock, [this]{ return new_data_ || shutdown_requested_; });
+    condition_variable_.wait(lock, [this] { return new_data_ || shutdown_requested_; });
 
     // if shutdown requested, end thread execution
     if (shutdown_requested_)
@@ -222,4 +217,4 @@ void Comm::process_callbacks()
   }
 }
 
-} // namespace async_comm
+}  // namespace async_comm

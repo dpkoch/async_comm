@@ -20,14 +20,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
@@ -43,12 +44,8 @@ using boost::asio::ip::tcp;
 
 namespace async_comm
 {
-
-TCPClient::TCPClient(std::string host, uint16_t port, MessageHandler& message_handler) :
-  Comm(message_handler),
-  host_(host),
-  port_(port),
-  socket_(io_service_)
+TCPClient::TCPClient(std::string host, uint16_t port, MessageHandler &message_handler)
+    : Comm(message_handler), host_(host), port_(port), socket_(io_service_)
 {
 }
 
@@ -75,8 +72,8 @@ bool TCPClient::do_init()
     socket_.connect(endpoint_);
 
     socket_.set_option(tcp::socket::reuse_address(true));
-    socket_.set_option(tcp::socket::send_buffer_size(WRITE_BUFFER_SIZE*1024));
-    socket_.set_option(tcp::socket::receive_buffer_size(READ_BUFFER_SIZE*1024));
+    socket_.set_option(tcp::socket::send_buffer_size(WRITE_BUFFER_SIZE * 1024));
+    socket_.set_option(tcp::socket::receive_buffer_size(READ_BUFFER_SIZE * 1024));
   }
   catch (boost::system::system_error e)
   {
@@ -93,15 +90,15 @@ void TCPClient::do_close()
 }
 
 void TCPClient::do_async_read(const boost::asio::mutable_buffers_1 &buffer,
-                        boost::function<void(const boost::system::error_code&, size_t)> handler)
+                              boost::function<void(const boost::system::error_code &, size_t)> handler)
 {
   socket_.async_receive(buffer, handler);
 }
 
 void TCPClient::do_async_write(const boost::asio::const_buffers_1 &buffer,
-                         boost::function<void(const boost::system::error_code&, size_t)> handler)
+                               boost::function<void(const boost::system::error_code &, size_t)> handler)
 {
   socket_.async_send(buffer, handler);
 }
 
-} // namespace async_comm
+}  // namespace async_comm
