@@ -112,7 +112,7 @@ void Comm::register_receive_callback(std::function<void(const uint8_t*, size_t)>
   receive_callback_ = fun;
 }
 
-void Comm::register_listener(CommListener* listener)
+void Comm::register_listener(CommListener &listener)
 {
   listeners_.push_back(listener);
 }
@@ -217,7 +217,7 @@ void Comm::process_callbacks()
     new_data_ = false;
     lock.unlock();
 
-    // execute callback for all new data
+    // execute callbacks for all new data
     while (!local_queue.empty())
     {
       ReadBuffer buffer = local_queue.front();
@@ -225,9 +225,9 @@ void Comm::process_callbacks()
       {
         receive_callback_(buffer.data, buffer.len);
       }
-      for (auto& l : listeners_)
+      for (std::reference_wrapper<CommListener> listener_ref : listeners_)
       {
-        l->read_cb(buffer.data, buffer.len);
+        listener_ref.get().receive_callback(buffer.data, buffer.len);
       }
       local_queue.pop_front();
     }

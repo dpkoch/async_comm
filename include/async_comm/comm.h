@@ -61,7 +61,17 @@ namespace async_comm
 class CommListener
 {
 public:
-  virtual void read_cb(const uint8_t *buf, const size_t size) = 0;
+  /**
+   * @brief Callback for data received
+   *
+   * @warning The data buffer passed to the callback function will be invalid after the callback function exits. If you
+   * want to store the data for later processing, you must copy the data to a new buffer rather than storing the
+   * pointer to the buffer.
+   *
+   * @param buf Address of buffer containing received bytes
+   * @param size Number of bytes in the receive buffer
+   */
+  virtual void receive_callback(const uint8_t * buf, size_t size) = 0;
 };
 
 /**
@@ -120,13 +130,13 @@ public:
   /**
    * @brief Register a listener for when bytes are received on the port
    *
-   * The listener must inherit from CommListener and implement the `read_cb` function.  This is
-   * another mechanism to receiving data from the Comm interface without needing to create
-   * function pointers.  Multiple listeners can be added and all will get the callback
+   * The listener must inherit from CommListener and implement the `receive_callback` function.  This is another
+   * mechanism for receiving data from the Comm interface without needing to create function pointers. Multiple
+   * listeners can be added and all will get the callback
    *
-   * @param listener pointer to listener (does not take ownership)
+   * @param listener Reference to listener
    */
-  void register_listener(CommListener *listener);
+  void register_listener(CommListener &listener);
 
 protected:
 
@@ -213,7 +223,7 @@ private:
   bool write_in_progress_;
 
   std::function<void(const uint8_t *, size_t)> receive_callback_ = nullptr;
-  std::vector<CommListener *> listeners_;
+  std::vector<std::reference_wrapper<CommListener>> listeners_;
 };
 
 } // namespace async_comm
