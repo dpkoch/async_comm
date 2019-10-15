@@ -55,6 +55,16 @@ namespace async_comm
 {
 
 /**
+ * @class CommListener
+ * @brief Abstract base class for getting comm events via a listener interface
+ */
+class CommListener
+{
+public:
+  virtual void read_cb(const uint8_t *buf, const size_t size) = 0;
+};
+
+/**
  * @class Comm
  * @brief Abstract base class for an asynchronous communication port
  */
@@ -106,6 +116,17 @@ public:
    * @param fun Function to call when bytes are received
    */
   void register_receive_callback(std::function<void(const uint8_t*, size_t)> fun);
+
+  /**
+   * @brief Register a listener for when bytes are received on the port
+   *
+   * The listener must inherit from CommListener and implement the `read_cb` function.  This is
+   * another mechanism to receiving data from the Comm interface without needing to create
+   * function pointers.  Multiple listeners can be added and all will get the callback
+   *
+   * @param listener pointer to listener (does not take ownership)
+   */
+  void register_listener(CommListener *listener);
 
 protected:
 
@@ -191,7 +212,8 @@ private:
   std::recursive_mutex write_mutex_;
   bool write_in_progress_;
 
-  std::function<void(const uint8_t*, size_t)> receive_callback_;
+  std::function<void(const uint8_t *, size_t)> receive_callback_ = nullptr;
+  std::vector<CommListener *> listeners_;
 };
 
 } // namespace async_comm
