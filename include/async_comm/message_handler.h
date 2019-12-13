@@ -62,6 +62,20 @@ public:
   virtual void fatal(const std::string& message) = 0;
 };
 
+/**
+ * @class DefaultMessageHandler
+ * @brief Default message handler that outputs to stdout and stderr
+ */
+class DefaultMessageHandler : public MessageHandler
+{
+public:
+  inline void debug(const std::string &message) override { std::cout << "[async_comm][DEBUG]: " << message << std::endl; }
+  inline void info(const std::string &message) override { std::cout << "[async_comm][INFO]: " << message << std::endl; }
+  inline void warn(const std::string &message) override { std::cerr << "[async_comm][WARN]: " << message << std::endl; }
+  inline void error(const std::string &message) override { std::cerr << "[async_comm][ERROR]: " << message << std::endl; }
+  inline void fatal(const std::string &message) override { std::cerr << "[async_comm][FATAL]: " << message << std::endl; }
+};
+
 } // namespace async_comm
 
 #endif // ASYNC_COMM_MESSAGE_HANDLER_H

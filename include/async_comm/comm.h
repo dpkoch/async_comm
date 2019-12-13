@@ -54,6 +54,8 @@
 namespace async_comm
 {
 
+extern DefaultMessageHandler default_message_handler_;
+
 /**
  * @class CommListener
  * @brief Abstract base class for getting comm events via a listener interface
@@ -142,17 +144,6 @@ protected:
 
   static constexpr size_t READ_BUFFER_SIZE = 1024;
   static constexpr size_t WRITE_BUFFER_SIZE = 1024;
-
-  class DefaultMessageHandler : public MessageHandler
-  {
-  public:
-    inline void debug(const std::string &message) override { std::cout << "[async_comm][DEBUG]: " << message << std::endl; }
-    inline void info(const std::string &message) override { std::cout << "[async_comm][INFO]: " << message << std::endl; }
-    inline void warn(const std::string &message) override { std::cerr << "[async_comm][WARN]: " << message << std::endl; }
-    inline void error(const std::string &message) override { std::cerr << "[async_comm][ERROR]: " << message << std::endl; }
-    inline void fatal(const std::string &message) override { std::cerr << "[async_comm][FATAL]: " << message << std::endl; }
-  };
-  static DefaultMessageHandler default_message_handler_;
 
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;
