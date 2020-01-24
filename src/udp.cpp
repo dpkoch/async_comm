@@ -72,10 +72,10 @@ bool UDP::do_init()
   {
     udp::resolver resolver(io_service_);
 
-    bind_endpoint_ = *resolver.resolve({udp::v4(), bind_host_, ""});
+    bind_endpoint_ = *resolver.resolve({udp::v4(), bind_host_, "", boost::asio::ip::resolver_query_base::numeric_service});
     bind_endpoint_.port(bind_port_);
 
-    remote_endpoint_ = *resolver.resolve({udp::v4(), remote_host_, ""});
+    remote_endpoint_ = *resolver.resolve({udp::v4(), remote_host_, "", boost::asio::ip::resolver_query_base::numeric_service});
     remote_endpoint_.port(remote_port_);
 
     socket_.open(udp::v4());
