@@ -54,7 +54,7 @@
 namespace async_comm
 {
 
-extern DefaultMessageHandler default_message_handler_;
+// extern DefaultMessageHandler default_message_handler_;
 
 /**
  * @class CommListener
@@ -87,7 +87,7 @@ public:
    * @brief Set up asynchronous communication base class
    * @param message_handler Custom message handler, or omit for default handler
    */
-  Comm(MessageHandler& message_handler = default_message_handler_);
+  Comm(MessageHandler& message_handler = *(new DefaultMessageHandler));
   virtual ~Comm();
 
   /**
@@ -153,6 +153,7 @@ protected:
   virtual void do_async_write(const boost::asio::const_buffers_1 &buffer,
                               boost::function<void(const boost::system::error_code&, size_t)> handler) = 0;
 
+  // DefaultMessageHandler default_message_handler_;
   MessageHandler& message_handler_;
   boost::asio::io_service io_service_;
 

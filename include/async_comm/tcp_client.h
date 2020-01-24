@@ -63,7 +63,7 @@ public:
    * @param message_handler Custom message handler, or omit for default handler
    */
   TCPClient(std::string host = DEFAULT_HOST, uint16_t port = DEFAULT_PORT,
-            MessageHandler& message_handler = default_message_handler_);
+            MessageHandler& message_handler = *(new DefaultMessageHandler));
   ~TCPClient();
 
 private:

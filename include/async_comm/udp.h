@@ -66,7 +66,7 @@ public:
    */
   UDP(std::string bind_host = DEFAULT_BIND_HOST, uint16_t bind_port = DEFAULT_BIND_PORT,
       std::string remote_host = DEFAULT_REMOTE_HOST, uint16_t remote_port = DEFAULT_REMOTE_PORT,
-      MessageHandler& message_handler = default_message_handler_);
+      MessageHandler& message_handler = *(new DefaultMessageHandler));
   ~UDP();
 
 private:

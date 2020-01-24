@@ -63,7 +63,8 @@ public:
    * @param message_handler Custom message handler, or omit for default handler
    *
    */
-  Serial(std::string port, unsigned int baud_rate, MessageHandler& message_handler = default_message_handler_);
+  Serial(std::string port, unsigned int baud_rate,
+         MessageHandler& message_handler = *(new DefaultMessageHandler));
   ~Serial();
 
 

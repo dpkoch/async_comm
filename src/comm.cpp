@@ -43,7 +43,7 @@
 namespace async_comm
 {
 
-DefaultMessageHandler default_message_handler_;
+// DefaultMessageHandler default_message_handler_;
 
 Comm::Comm(MessageHandler& message_handler) :
   message_handler_(message_handler),
@@ -52,6 +52,8 @@ Comm::Comm(MessageHandler& message_handler) :
   shutdown_requested_(false),
   write_in_progress_(false)
 {
+  // if (message_handler_ == nullptr)
+  //   message_handler_ = &default_message_handler_;
 }
 
 Comm::~Comm()
