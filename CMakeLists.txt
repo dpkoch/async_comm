@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(async_comm)
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
-
 if (NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif (NOT DEFINED CMAKE_BUILD_TYPE)
@@ -10,15 +8,17 @@ endif (NOT DEFINED CMAKE_BUILD_TYPE)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(Threads)
 
-include_directories(include)
-include_directories(${Boost_INCLUDE_DIRS})
-
 add_library(${PROJECT_NAME} SHARED
   src/comm.cpp
   src/udp.cpp
   src/serial.cpp
   src/tcp_client.cpp
 )
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include,${Boost_INCLUDE_DIRS}>
+  $<INSTALL_INTERFACE:include>
+)
+target_compile_options(${PROJECT_NAME} PRIVATE -std=c++11)
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 # examples
