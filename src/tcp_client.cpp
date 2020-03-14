@@ -68,7 +68,7 @@ bool TCPClient::do_init()
   {
     tcp::resolver resolver(io_service_);
 
-    endpoint_ = *resolver.resolve({tcp::v4(), host_, ""});
+    endpoint_ = *resolver.resolve({tcp::v4(), host_, "", boost::asio::ip::resolver_query_base::numeric_service});
     endpoint_.port(port_);
     socket_.open(tcp::v4());
 
