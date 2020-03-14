@@ -54,8 +54,6 @@
 namespace async_comm
 {
 
-extern DefaultMessageHandler default_message_handler_;
-
 /**
  * @class CommListener
  * @brief Abstract base class for getting comm events via a listener interface
@@ -144,6 +142,8 @@ protected:
 
   static constexpr size_t READ_BUFFER_SIZE = 1024;
   static constexpr size_t WRITE_BUFFER_SIZE = 1024;
+
+  static DefaultMessageHandler default_message_handler_;
 
   virtual bool is_open() = 0;
   virtual bool do_init() = 0;

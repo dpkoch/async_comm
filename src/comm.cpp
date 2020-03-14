@@ -43,7 +43,7 @@
 namespace async_comm
 {
 
-DefaultMessageHandler default_message_handler_;
+DefaultMessageHandler Comm::default_message_handler_;
 
 Comm::Comm(MessageHandler& message_handler) :
   message_handler_(message_handler),
