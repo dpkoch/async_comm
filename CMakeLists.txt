@@ -14,8 +14,9 @@ add_library(${PROJECT_NAME} SHARED
   src/serial.cpp
   src/tcp_client.cpp
 )
+target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include,${Boost_INCLUDE_DIRS}>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 target_compile_options(${PROJECT_NAME} PRIVATE -std=c++11)
@@ -58,4 +59,3 @@ install(FILES ${PROJECT_NAME}-config.cmake DESTINATION ${LIB_DEST})
 
 # install package.xml for ROS release
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
-
