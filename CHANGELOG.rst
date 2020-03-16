@@ -2,6 +2,14 @@
 Changelog for package async_comm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix for UDP/TCP when loopback is only device with an address
+* Added listener interface
+* Added custom message handler functionality
+* TCPClient class implementing an async tcp client
+* Contributors: Daniel Koch, James Jackson, Rein Appeldoorn
+
 0.1.1 (2019-02-21)
 ------------------
 * Some cleanup
