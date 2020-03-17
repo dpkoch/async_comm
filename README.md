@@ -33,20 +33,16 @@ Replace `<DISTRO>` with your ROS distribution. The library is currently released
 Then, add something like the following lines to your package's CMakeLists.txt:
 
 ```CMake
-set(CMAKE_CXX_FLAGS "-std=c++11")
+# ...
 
 find_package(async_comm REQUIRED)
 
 catkin_package(
-  ...
+  # ...
   DEPENDS async_comm
 )
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-  ...
-  ${async_comm_INCLUDE_DIRS}
-)
+# ...
 
 add_executable(my_node src/my_node.cpp)
 target_link_libraries(my_node ${async_comm_LIBRARIES})
@@ -78,13 +74,10 @@ sudo make install
 Then, do something like this in your project's CMakeLists.txt:
 
 ```CMake
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0.2)
 project(my_project)
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
-
 find_package(async_comm REQUIRED)
-include_directories(${async_comm_INCLUDE_DIRS})
 
 add_executable(my_project src/my_project.cpp)
 target_link_libraries(my_project ${async_comm_LIBRARIES})
@@ -103,13 +96,10 @@ git submodule add https://github.com/dpkoch/async_comm.git lib/async_comm
 Your CMakeLists.txt file would then look something like this:
 
 ```CMake
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0.2)
 project(my_project)
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
-
 add_subdirectory(lib/async_comm)
-include_directories(lib/async_comm/include)
 
 add_executable(my_project src/my_project.cpp)
 target_link_libraries(my_project async_comm)
