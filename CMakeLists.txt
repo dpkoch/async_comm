@@ -39,23 +39,19 @@ if(ASYNC_COMM_BUILD_EXAMPLES)
   target_link_libraries(tcp_client_hello_world ${PROJECT_NAME})
 endif(ASYNC_COMM_BUILD_EXAMPLES)
 
-# install
-set(LIB_DEST lib/${PROJECT_NAME})
-set(INCLUDE_DEST include)
-
 install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION ${LIB_DEST}
-  LIBRARY DESTINATION ${LIB_DEST}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
 )
 install(DIRECTORY include/${PROJECT_NAME}
-  DESTINATION ${INCLUDE_DEST}
+  DESTINATION include
   FILES_MATCHING PATTERN "*.h"
 )
 
 # install CMake package configuration
-install(EXPORT ${PROJECT_NAME}-targets DESTINATION ${LIB_DEST})
-install(FILES ${PROJECT_NAME}-config.cmake DESTINATION ${LIB_DEST})
+install(EXPORT ${PROJECT_NAME}-targets DESTINATION lib/${PROJECT_NAME})
+install(FILES ${PROJECT_NAME}-config.cmake DESTINATION lib/${PROJECT_NAME})
 
 # install package.xml for ROS release
 install(FILES package.xml DESTINATION share/${PROJECT_NAME})
