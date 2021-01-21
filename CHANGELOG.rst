@@ -2,8 +2,8 @@
 Changelog for package async_comm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.1 (2021-01-21)
+------------------
 * Add noetic to ROS prerelease test distribution list
 * Fixes for compatibility with ROS2 workspaces:
 
