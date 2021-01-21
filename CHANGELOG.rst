@@ -2,6 +2,17 @@
 Changelog for package async_comm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add noetic to ROS prerelease test distribution list
+* Fixes for compatibility with ROS2 workspaces:
+
+  * cmake: Change install paths to basic lib/ and include/
+  * package.xml: Remove unneeded catkin dependency
+
+* Updated CMake examples in README
+* Contributors: Daniel Koch, Maciej Bogusz
+
 0.2.0 (2020-03-16)
 ------------------
 * Fix for UDP/TCP when loopback is only device with an address
