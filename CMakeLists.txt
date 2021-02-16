@@ -21,6 +21,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11)
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+if(WIN32)
+  # disable autolinking in boost
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_ALL_NO_LIB)
+endif(WIN32)
 
 # examples
 option(ASYNC_COMM_BUILD_EXAMPLES "Build examples" OFF)
