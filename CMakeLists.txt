@@ -14,8 +14,8 @@ add_library(${PROJECT_NAME} SHARED
   src/serial.cpp
   src/tcp_client.cpp
 )
-target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC
+  ${Boost_INCLUDE_DIRS}
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
