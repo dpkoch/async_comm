@@ -8,7 +8,9 @@ endif (NOT DEFINED CMAKE_BUILD_TYPE)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(Threads)
 
-add_library(${PROJECT_NAME} SHARED
+option(BUILD_SHARED_LIBS "Build shared library" ON)
+
+add_library(${PROJECT_NAME}
   src/comm.cpp
   src/udp.cpp
   src/serial.cpp
