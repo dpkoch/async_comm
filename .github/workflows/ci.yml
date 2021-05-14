@@ -17,6 +17,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install Boost
+      run: sudo apt-get install -y libboost-dev
+
     - name: Configure CMake
       run: |
         cmake -B ${{github.workspace}}/build \
