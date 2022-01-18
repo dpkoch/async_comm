@@ -38,7 +38,7 @@
 #include <async_comm/comm.h>
 
 #include <iostream>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace async_comm
 {
