@@ -48,6 +48,18 @@ Serial::Serial(std::string port, unsigned int baud_rate, MessageHandler& message
   Comm(message_handler),
   port_(port),
   baud_rate_(baud_rate),
+  flow_control_(serial_flow_control::none),
+  serial_port_(io_service_)
+{
+}
+
+Serial::Serial(std::string port, unsigned int baud_rate,
+               serial_flow_control flow_control,
+               MessageHandler& message_handler) :
+  Comm(message_handler),
+  port_(port),
+  baud_rate_(baud_rate),
+  flow_control_(flow_control),
   serial_port_(io_service_)
 {
 }
@@ -73,6 +85,22 @@ bool Serial::set_baud_rate(unsigned int baud_rate)
   return true;
 }
 
+bool Serial::set_flow_control (serial_flow_control flow_control)
+{
+  flow_control_ = flow_control;
+  try
+  {
+    serial_port_.set_option(serial_port_base::flow_control(flow_control_));
+  }
+  catch (boost::system::system_error e)
+  {
+    message_handler_.error(e.what());
+    return false;
+  }
+
+  return true;
+}
+
 bool Serial::is_open()
 {
   return serial_port_.is_open();
@@ -87,7 +115,7 @@ bool Serial::do_init()
     serial_port_.set_option(serial_port_base::character_size(8));
     serial_port_.set_option(serial_port_base::parity(serial_port_base::parity::none));
     serial_port_.set_option(serial_port_base::stop_bits(serial_port_base::stop_bits::one));
-    serial_port_.set_option(serial_port_base::flow_control(serial_port_base::flow_control::none));
+    serial_port_.set_option(serial_port_base::flow_control(flow_control_));
   }
   catch (boost::system::system_error e)
   {
