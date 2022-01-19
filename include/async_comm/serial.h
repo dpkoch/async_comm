@@ -48,6 +48,7 @@
 
 namespace async_comm
 {
+  using serial_flow_control = boost::asio::serial_port_base::flow_control::type;
 
 /**
  * @class Serial
@@ -60,10 +61,15 @@ public:
    * @brief Open a serial port
    * @param port The port to open (e.g. "/dev/ttyUSB0")
    * @param baud_rate The baud rate for the serial port (e.g. 115200)
+   * @param flow_control The serial port flow control (none, software or hardware)
+   * this is optional and defaults to none.
    * @param message_handler Custom message handler, or omit for default handler
    *
    */
   Serial(std::string port, unsigned int baud_rate, MessageHandler& message_handler = default_message_handler_);
+  Serial(std::string port, unsigned int baud_rate,
+         serial_flow_control flow_control,
+         MessageHandler& message_handler = default_message_handler_);
   ~Serial();
 
 
@@ -73,6 +79,17 @@ public:
    * @return True if successful
    */
   bool set_baud_rate(unsigned int baud_rate);
+
+  /**
+   * @brief Set the serial port flow control
+   * 
+   * @param flow_control the flow control option to configure
+   *   serial_flow_control::none: No Flow Control
+   *   serial_flow_control::software: Software Flow Control
+   *   serial_flow_control::hardware: Hardware Flow Control
+   * @return True if successful
+   */
+  bool set_flow_control (serial_flow_control flow_control);
 
 private:
   bool is_open() override;
@@ -87,6 +104,8 @@ private:
   unsigned int baud_rate_;
 
   boost::asio::serial_port serial_port_;
+
+  serial_flow_control flow_control_;
 };
 
 } // namespace async_comm
